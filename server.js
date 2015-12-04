@@ -11,11 +11,17 @@ app.use(express.static(__dirname + '/public'));
 
 let usernames = {};
 let numUsers = 0;
-
 io.on('connection', socket => {
 
   let addedUser = false;
 
+  //send new message
+  socket.on('new message', data => {
+    socket.broadcast.emit('new message', {
+      username: socket.username,
+      message: data
+    });
+  });
 
   //na username ingeven
   socket.on('add user',  username => {
@@ -24,14 +30,26 @@ io.on('connection', socket => {
     usernames[username] = username;
     ++numUsers;
     addedUser = true;
-
     socket.emit('login', {
       numUsers: numUsers
     });
-
     socket.broadcast.emit('user joined', {
       username: socket.username,
       numUsers: numUsers
+    });
+  });
+
+  //... is typing
+  socket.on('typing', () => {
+    socket.broadcast.emit('typing', {
+      username: socket.username
+    });
+  });
+
+  //stop typing message
+  socket.on('stop typing', () => {
+    socket.broadcast.emit('stop typing', {
+      username: socket.username
     });
   });
 
