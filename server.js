@@ -1,37 +1,58 @@
 'use strict';
 
-require('dotenv').load({silent: true});
-
-let Hapi = require('hapi');
-let path = require('path');
+let express = require('express');
+let app = express();
+let server = require('http').Server(app);
+let io = require('socket.io')(server);
 
 let port = process.env.PORT || 3000;
 
-let server = new Hapi.Server({
-  connections: {
-    routes: {
-      files: {
-        relativeTo: path.join(__dirname, 'public')
-      }
-    },
-    router: {
-      stripTrailingSlash: true
+app.use(express.static(__dirname + '/public'));
+
+let usernames = {};
+let numUsers = 0;
+
+io.on('connection', socket => {
+
+  let addedUser = false;
+
+  //send new message
+  socket.on('new message', data => {
+    socket.broadcast.emit('new message', {
+      username: socket.username,
+      message: data
+    });
+  });
+
+  //na username ingeven
+  socket.on('add user',  username => {
+    //username in socket variabele steken
+    socket.username = username;
+    usernames[username] = username;
+    ++numUsers;
+    addedUser = true;
+    socket.emit('login', {
+      numUsers: numUsers
+    });
+    socket.broadcast.emit('user joined', {
+      username: socket.username,
+      numUsers: numUsers
+    });
+  });
+
+  //user ... left
+  socket.on('disconnect', () => {
+    if (addedUser) {
+      delete usernames[socket.username];
+      --numUsers;
+      socket.broadcast.emit('user left', {
+        username: socket.username,
+        numUsers: numUsers
+      });
     }
-  }
+  });
 });
 
-server.connection({port: port});
-
-const pluginHandler = (err) => {
-  if(err) console.error(err);
-};
-
-server.register(require('inert'), pluginHandler);
-
-server.register(require('./plugins/'), pluginHandler);
-server.register(require('./routes/'), pluginHandler);
-
-server.start(err => {
-  if(err) console.error(err);
-  console.log(`Server running at: http://localhost:${port}`);
+server.listen(port, () => {
+  console.log('Server listening at port %d', port);
 });
