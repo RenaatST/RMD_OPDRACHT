@@ -50,7 +50,7 @@
 /* 1 */
 /***/ function(module, exports) {
 
-	eval("'use strict';\n\n// some features need the be polyfilled..\n// https://babeljs.io/docs/usage/polyfill/\n\n// import 'babel-core/polyfill';\n// or import specific polyfills\n// import {$} from './helpers/util';\n\nvar init = function init() {\n  console.log('Hello World Renaat Stuijk & Tom Heldenbergh');\n};\n\ninit();\n\n/*****************\n ** WEBPACK FOOTER\n ** ./_js/script.js\n ** module id = 1\n ** module chunks = 0\n **/\n//# sourceURL=webpack:///./_js/script.js?");
+	eval("'use strict';\n\nvar init = function init() {\n\n  var canvas = document.getElementById(\"test\");\n  var ctx = canvas.getContext(\"2d\");\n  var count = 0;\n  var start_x = 0;\n  var start_y = 100;\n  var end_x = 10000;\n  var end_y = 100;\n\n  var counter = setInterval(countNumbers, 100);\n\n  ctx.beginPath();\n  ctx.moveTo(start_x, start_y);\n  console.log(\"Start\");\n  ctx.lineWidth = 2;\n  ctx.strokeStyle = \"black\";\n\n  function countNumbers() {\n    count += 1;\n    ctx.lineTo(start_x + count, start_y);\n\n    ctx.stroke();\n    console.log(count);\n    if (start_x === end_x) {\n      clearInterval(counter);\n      console.log(\"End\");\n    }\n  }\n};\n\ninit();\n\n/*****************\n ** WEBPACK FOOTER\n ** ./_js/script.js\n ** module id = 1\n ** module chunks = 0\n **/\n//# sourceURL=webpack:///./_js/script.js?");
 
 /***/ },
 /* 2 */

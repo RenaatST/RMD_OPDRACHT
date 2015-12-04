@@ -12,11 +12,6 @@ let server = new Hapi.Server({
     routes: {
       files: {
         relativeTo: path.join(__dirname, 'public')
-      },
-      validate: {
-        options: {
-          abortEarly: false
-        }
       }
     },
     router: {
@@ -32,37 +27,9 @@ const pluginHandler = (err) => {
 };
 
 server.register(require('inert'), pluginHandler);
-server.register(require('vision'), pluginHandler);
 
-server.register({
-  register: require('yar'),
-  options: {
-    storeBlank: false,
-    cookieOptions: {
-      password: 'l3o65p4v1v2t9',
-      isSecure: false
-    }
-  }
-}, pluginHandler);
 server.register(require('./plugins/'), pluginHandler);
 server.register(require('./routes/'), pluginHandler);
-
-server.views({
-
-  engines: {
-    hbs: require('handlebars')
-  },
-
-  relativeTo: `${__dirname}/templates`,
-  path: '.',
-
-  layout: true,
-
-  helpersPath: 'helpers',
-  layoutPath: 'layouts',
-  partialsPath: 'partials'
-
-});
 
 server.start(err => {
   if(err) console.error(err);
