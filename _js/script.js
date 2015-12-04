@@ -1,13 +1,16 @@
 'use strict';
-let $window = $(window);
+
+import {html, $} from './helpers/util';
+
 let $usernameInput = $('.usernameInput');
 let socket;
 let socketid;
 let $loginPage = $('.login.page'); // The login page
 let username;
+let users = [];
 let connected = false;
 let $currentInput = $usernameInput.focus();
-
+let $messages = $('.users'); // Messages area
 
 /*
 let recorder = null;
@@ -19,8 +22,8 @@ let lastClap = (new Date()).getTime();
 let drisgeklapt = false;
 let _clapY = null;
 */
-
-$window.keydown(function (event) {
+/*
+$('window').keydown(function (event) {
     if (!(event.ctrlKey || event.metaKey || event.altKey)) {
       $currentInput.focus();
     }
@@ -29,43 +32,22 @@ $window.keydown(function (event) {
         setUsername();
     }
 });
-
+*/
 
 const cleanInput = (input) => {
     return $('<div/>').text(input).text();
 };
 
-const addMessageElement = (el, options) => {
+const addMessageElement = (el) => {
   var $el = $(el);
-
-  // Setup default options
-  if (!options) {
-    options = {};
-  }
-  if (typeof options.fade === 'undefined') {
-    options.fade = true;
-  }
-  if (typeof options.prepend === 'undefined') {
-    options.prepend = false;
-  }
-
-  // Apply options
-  if (options.fade) {
-    $el.hide().fadeIn(FADE_TIME);
-  }
-  if (options.prepend) {
-    $messages.prepend($el);
-  } else {
-    $messages.append($el);
-  }
-  $messages[0].scrollTop = $messages[0].scrollHeight;
+  $messages.append($el);
 };
 
 const setUsername = () => {
     username = cleanInput($usernameInput.val().trim());
 
     if (username) {
-      console.log("username");
+      console.log(username);
       $loginPage.fadeOut();
       $loginPage.off('click');
       socket.emit('add user', username);
@@ -74,28 +56,30 @@ const setUsername = () => {
 
 const log = (message) => {
     var $el = $('<li>').addClass('log').text(message);
-    addMessageElement($el, options);
+    addMessageElement($el);
 };
 
 const init = () => {
 
+  let users = $('.users');
+
   socket = io('http://localhost:3000');
 
-  socket.on('login', function (data) {
-    connected = true;
-    var message = "Welcome to HamsterSound– ";
-    log("message", message);
-  });
-
-  socket.on('user joined', function (data) {
-    log(data.username + ' joined');
-    log("data", data);
+  socket.on('user joined', client => {
+    let $el = html(client);
+    users.appendChild($el);
   });
 
   socket.on('user left', function (data) {
-    log(data.username + ' left');
+    //log(data.username + ' left');
     addParticipantsMessage(data);
     removeChatTyping(data);
+  });
+
+  socket.on('login', function (data) {
+    connected = true;
+    var message = 'Welcome to HamsterSound!';
+    log(message);
   });
 
 /*
