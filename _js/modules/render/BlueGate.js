@@ -1,20 +1,17 @@
 'use strict';
 
 import EventEmitter from 'eventemitter2';
-import {MathUtil, SoundUtil} from '../util/';
 
 export default class BlueGate extends EventEmitter {
 
-  constructor(position, rotation){
+  constructor(position){
     super();
 
     this.position = position;
-    this.rotation = rotation;
     this._onFrame();
   }
 
   _onFrame(){
-    let {x, y, z} = this.position;
 
     this.position.x = 5000;
     this.position.y = 0;
@@ -28,7 +25,7 @@ export default class BlueGate extends EventEmitter {
   render(){
     let {x, y, z} = this.position;
     let {color} = this;
-    let {rotation} = this;
+
     let radius = 300;
     var geometry = new THREE.TorusGeometry( radius, 50, 20, 5 );
     let material = new THREE.MeshBasicMaterial({ color: color, wireframe: true});
@@ -36,8 +33,7 @@ export default class BlueGate extends EventEmitter {
     this.cube = cube;
 
     let spriteMaterial = new THREE.SpriteMaterial({
-      map: new THREE.ImageUtils.loadTexture( '../assets/nodemon.png'),
-      useScreenCoordinates: false,
+      map: new THREE.TextureLoader().load('../assets/nodemon.png'),
       color: color, transparent: true, blending: THREE.AdditiveBlending
     });
 
@@ -47,7 +43,9 @@ export default class BlueGate extends EventEmitter {
 
 
     cube.rotation.y = 80;
+
     cube.position.x = x;
+    cube.position.y = y;
     cube.position.z = z;
     return cube;
   }
@@ -58,7 +56,7 @@ export default class BlueGate extends EventEmitter {
     return this.render();
   }
 
-  _initBlue(rotation){
+  _initBlue(){
     this.color = 0x0000FF;
     return this.render();
   }

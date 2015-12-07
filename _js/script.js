@@ -1,13 +1,14 @@
 'use strict';
-
-import {html} from './helpers/util';
+// import {html} from './helpers/util';
+import {MathUtil} from './modules/util/';
+import BlueGate from './modules/render/BlueGate';
+import RedGate from './modules/render/RedGate';
 
 let $window = $(window);
 let $usernameInput = $('.usernameInput');
 let $loginPage = $('.login.page');
 let $gamepage = $('.game.page');
 let username;
-let connected;
 let $currentInput = $usernameInput.focus();
 
 let bounds;
@@ -24,7 +25,6 @@ let scene, camera, renderer;
 let moveX = 0;
 let moveY = 0;
 
-
 let material = new THREE.MeshBasicMaterial({color: '#F9C224', wireframe: true});
 var geometry = new THREE.SphereGeometry( 50, 1, 1 );
 let circle = new THREE.Mesh(geometry, material);
@@ -37,25 +37,7 @@ let blueGate = new BlueGate(MathUtil.randomPoint(bounds), rotation);
 let redGate = new RedGate(MathUtil.randomPoint(bounds));
 
 
-
-
-import {MathUtil, SoundUtil} from './modules/util/';
-import BlueGate from './modules/render/BlueGate';
-import RedGate from './modules/render/RedGate';
-
-
 const gamepage = () => {
-
-  let spriteMaterial = new THREE.SpriteMaterial(
-  {
-    map: new THREE.ImageUtils.loadTexture( '../assets/nodemon.png'),
-    useScreenCoordinates: false,
-    color: '#ffffff' , transparent: false, blending: THREE.AdditiveBlending
-  });
-
-  let sprite = new THREE.Sprite( spriteMaterial );
-  sprite.scale.set(50, 50, 1.0);
-  circle.add(sprite);
 
   let AudioContext = window.AudioContext || window.webkitAudioContext;
   audioContext = new AudioContext();
@@ -85,6 +67,17 @@ const gamepage = () => {
 
   camera.position.z = 1900;
   camera.rotation.y = -0.5;
+
+
+  let spriteMaterial = new THREE.SpriteMaterial({
+    map: new THREE.TextureLoader().load('../assets/nodemon.png'),
+    color: '#ffffff', transparent: false, blending: THREE.AdditiveBlending
+  });
+
+  let sprite = new THREE.Sprite(spriteMaterial);
+  sprite.scale.set(50, 50, 1.0);
+  circle.add(sprite);
+
   renderer.setClearColor('#010322', 1);
 
   player();
@@ -101,7 +94,7 @@ const red = () => {
 };
 
 
-const blue = moveX1 => {
+const blue = () => {
   scene.add(blueGate._initBlue());
 };
 
@@ -135,8 +128,6 @@ const render = () => {
       scene.remove(redGate.cube);
       scene.add(redGate._hitRed());
       hitRed = false;
-    }else{
-
     }
   }
 
@@ -167,15 +158,15 @@ const sound = () => {
       audio: true
     },
 
-    function(e){
+    e => {
       volume = audioContext.createGain(); // creates a gain node
       audioInput = audioContext.createMediaStreamSource(e); // creates an audio node from the mic stream
       audioInput.connect(volume);// connect the stream to the gain node
       recorder = audioContext.createScriptProcessor(2048, 1, 1);
 
-      recorder.onaudioprocess = function(e){
+      recorder.onaudioprocess = b =>{
         if(!recording) return;
-        var left = e.inputBuffer.getChannelData(0);
+        var left = b.inputBuffer.getChannelData(0);
         // var right = e.inputBuffer.getChannelData(1);
         detectSound(left);
       };
@@ -183,13 +174,14 @@ const sound = () => {
       volume.connect(recorder);// connect the recorder
       recorder.connect(audioContext.destination);
     },
-
-    function(){ //failure
-      alert('Error capturing audio.');
+    () => { //failure
+      let customAlert;
+      customAlert('Error capturing audio.');
     });
 
   } else {
-    alert('getUserMedia not supported in this browser.');
+    let customAlert;
+    customAlert('getUserMedia not supported in this browser.');
   }
 
 };
@@ -246,32 +238,33 @@ const addParticipantsMessage = (data) => {
   if (data.numUsers === 1) {
     message += 'there`s 1 participant';
   } else {
-    message += 'there are ' + data.numUsers + ' participants';
+    message += `there are ${data.numUsers} participants`;
   }
   console.log(message);
 };
 
 
-const detectClap = data => {
-  var t = (new Date()).getTime();
-  if(t - lastClap < 200) return false; // TWEAK HERE
-  var zeroCrossings = 0, highAmp = 0;
-  for(var i = 1; i < data.length; i++){
-    if(Math.abs(data[i]) > 0.25) highAmp++; // TWEAK HERE
-    if(data[i] > 0 && data[i-1] < 0 || data[i] < 0 && data[i-1] > 0) zeroCrossings++;
-  }
-  if(highAmp > 20 && zeroCrossings > 30){ // TWEAK HERE
-    lastClap = t;
-    _clapY = highAmp;
-    return true;
-  }
-  drisgeklapt = false;
-  return false;
-};
+// const detectClap = data => {
+//   var t = (new Date()).getTime();
+//   if(t - lastClap < 200) return false; // TWEAK HERE
+//   var zeroCrossings = 0, highAmp = 0;
+//   for(var i = 1; i < data.length; i++){
+//     if(Math.abs(data[i]) > 0.25) highAmp++; // TWEAK HERE
+//     if(data[i] > 0 && data[i-1] < 0 || data[i] < 0 && data[i-1] > 0) zeroCrossings++;
+//   }
+//   if(highAmp > 20 && zeroCrossings > 30){ // TWEAK HERE
+//     lastClap = t;
+//     // _clapY = highAmp;
+//     return true;
+//   }
+//   return false;
+// };
 
 
+// $window.keydown((function) (event) {
 
-$window.keydown(function (event) {
+// weetniet zeker kan zijn dat et nie werkt nu
+$window.keydown(() => {
   if (!(event.ctrlKey || event.metaKey || event.altKey)) {
     $currentInput.focus();
   }
@@ -285,9 +278,8 @@ $window.keydown(function (event) {
 
 
 const init = () => {
-
   socket.on('login', data => {
-    connected = true;
+    // connected = true;
     console.log(data);
     var message = 'Welcome to HamsterSound';
     log(message, {

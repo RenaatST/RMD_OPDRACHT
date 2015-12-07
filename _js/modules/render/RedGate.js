@@ -1,6 +1,5 @@
 'use strict';
 
-import {MathUtil} from '../util/';
 import EventEmitter from 'eventemitter2';
 
 export default class RedGate extends EventEmitter {
@@ -15,7 +14,6 @@ export default class RedGate extends EventEmitter {
 
   _onFrame(){
 
-    let {x, y, z} = this.position;
 
     this.position.x = 8000;
     this.position.y = 0;
@@ -26,7 +24,6 @@ export default class RedGate extends EventEmitter {
   }
 
   render(){
-
     let {x, y, z} = this.position;
     let {color} = this;
     let radius = 300;
@@ -38,8 +35,7 @@ export default class RedGate extends EventEmitter {
 
 
     let spriteMaterial = new THREE.SpriteMaterial({
-      map: new THREE.ImageUtils.loadTexture( '../assets/nodemon.png'),
-      useScreenCoordinates: false,
+      map: new THREE.TextureLoader().load('../assets/nodemon.png'),
       color: color, transparent: true, blending: THREE.AdditiveBlending
     });
 
@@ -57,7 +53,7 @@ export default class RedGate extends EventEmitter {
 
   }
 
-   _hitRed(){
+  _hitRed(){
     this.color = 0x949955;
     return this.render();
   }
