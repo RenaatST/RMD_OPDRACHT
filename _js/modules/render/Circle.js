@@ -10,6 +10,8 @@ export default class Circle extends EventEmitter {
 
     // this.type = type;
     this.position = position;
+
+
     // this.highAmp = highAmp;
 
     this._initMoving();

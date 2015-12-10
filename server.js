@@ -1,69 +1,68 @@
 'use strict';
 
+
 let express = require('express');
 let app = express();
 let server = require('http').Server(app);
 let io = require('socket.io')(server);
-
-let port = process.env.PORT || 3000;
+let users = [];
+let port = process.env.PORT || 8080;
+let secret = 'test';
 
 app.use(express.static(__dirname + '/public'));
 
-let usernames = {};
-let numUsers = 0;
+
+let socketid;
+
 io.on('connection', socket => {
 
-  let addedUser = false;
+  socket.emit("socketid", socket.id);
+  socketid = socket.id;
 
-  //send new message
-  socket.on('new message', data => {
-    socket.broadcast.emit('new message', {
-      username: socket.username,
-      message: data
-    });
+  // socket.on('load', data => {
+  //   socket.emit('access', {
+  //     access: (data.key === secret ? "granted" : "denied")
+  //   });
+
+  // });
+  socket.on('knopgedrukt', data => {
+    console.log("op de knop gedrukt -- SERVER");
+    //socket.emit('drisgedrukt', socketid);
+    socket.broadcast.emit('drisgedrukt', socketid);
   });
 
-  //na username ingeven
-  socket.on('add user',  username => {
-    //username in socket variabele steken
-    socket.username = username;
-    usernames[username] = username;
-    ++numUsers;
-    addedUser = true;
-    socket.emit('login', {
-      numUsers: numUsers
-    });
-    socket.broadcast.emit('user joined', {
-      username: socket.username,
-      numUsers: numUsers
-    });
-  });
+  // //na username ingeven
+  // socket.on('add user',  username => {
 
-  //... is typing
-  socket.on('typing', () => {
-    socket.broadcast.emit('typing', {
-      username: socket.username
-    });
-  });
+  //   socket.broadcast.emit('login', {
+  //     socketid: socketid
+  //   });
 
-  //stop typing message
-  socket.on('stop typing', () => {
-    socket.broadcast.emit('stop typing', {
-      username: socket.username
-    });
-  });
+  //   let maxID = 0;
 
-  //user ... left
+  //   if(users.length > 0){
+  //     users.forEach(user => {
+  //       if(user.id > maxID){
+  //         maxID = user.id;
+  //       }
+  //     });
+  //   }
+
+  //   let user = new User(maxID + 1, socket.id, username);
+  //   users.push(user);
+  //   console.log(users);
+  //   socket.emit('userjoined', user);
+
+  // });
+
+
   socket.on('disconnect', () => {
-    if (addedUser) {
-      delete usernames[socket.username];
-      --numUsers;
-      socket.broadcast.emit('user left', {
-        username: socket.username,
-        numUsers: numUsers
-      });
-    }
+    socket.broadcast.emit('leave', socketid);
+    users = users.filter(c => c.socketid !== socket.id);
+    console.log(users);
   });
+
+
 });
 
 server.listen(port, () => {

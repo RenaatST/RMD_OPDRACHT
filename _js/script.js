@@ -3,18 +3,39 @@
 import {MathUtil} from './modules/util/';
 import BlueGate from './modules/render/BlueGate';
 import RedGate from './modules/render/RedGate';
+import {html} from './helpers/util';
+
+/////////////SOCKET NODE USER SMARTPHONE/////////////
+/////////////SOCKET NODE USER SMARTPHONE/////////////
+/////////////SOCKET NODE USER SMARTPHONE/////////////
+
 
 let $window = $(window);
 let $usernameInput = $('.usernameInput');
 let $loginPage = $('.login.page');
 let $gamepage = $('.game.page');
 let username;
+let connected;
 let $currentInput = $usernameInput.focus();
+let initialized = false;
+let users = [];
+
+let socket = io();
+
+let form = $('form.login');
+let form2 = $('form.usernameform');
+let secretTextBox = form.find('input[type=text]');
+let secretTextBox2 = form2.find('input[type=text]');
+let presentation = $('.gamepage');
+let key = "", animationTimeout;
+
+
+///////////////////////GAME///////////////////////////
+///////////////////////GAME///////////////////////////
+///////////////////////GAME///////////////////////////
 
 let bounds;
-
 let geluid = true;
-
 let recorder = null;
 let recording = true;
 let audioInput = null;
@@ -24,7 +45,6 @@ let lastClap = (new Date()).getTime();
 let scene, camera, renderer;
 let moveX = 0;
 let moveY = 0;
-
 let material = new THREE.MeshBasicMaterial({color: '#F9C224', wireframe: true});
 var geometry = new THREE.SphereGeometry( 50, 1, 1 );
 let circle = new THREE.Mesh(geometry, material);
@@ -210,95 +230,88 @@ const detectSound = data => {
   return false;
 };
 
-let socket = io('http://localhost:3000');
-
-const log = (message) => {
-  let $el = $('<li>').addClass('log').text(message);
-  $('.users').append($el);
-};
-
-const cleanInput = (input) => {
-  return $('<div/>').text(input).text();
-};
-
-const setUsername = () => {
-  username = cleanInput($usernameInput.val().trim());
-
-  if (username) {
-    $loginPage.fadeOut();
-    $gamepage.show();
-    gamepage();
-    $loginPage.off('click');
-    socket.emit('add user', username);
-  }
-};
-
-const addParticipantsMessage = (data) => {
-  var message = '';
-  if (data.numUsers === 1) {
-    message += 'there`s 1 participant';
-  } else {
-    message += `there are ${data.numUsers} participants`;
-  }
-  console.log(message);
-};
-
-
-// const detectClap = data => {
-//   var t = (new Date()).getTime();
-//   if(t - lastClap < 200) return false; // TWEAK HERE
-//   var zeroCrossings = 0, highAmp = 0;
-//   for(var i = 1; i < data.length; i++){
-//     if(Math.abs(data[i]) > 0.25) highAmp++; // TWEAK HERE
-//     if(data[i] > 0 && data[i-1] < 0 || data[i] < 0 && data[i-1] > 0) zeroCrossings++;
-//   }
-//   if(highAmp > 20 && zeroCrossings > 30){ // TWEAK HERE
-//     lastClap = t;
-//     // _clapY = highAmp;
-//     return true;
-//   }
-//   return false;
-// };
-
-
-// $window.keydown((function) (event) {
-
-// weetniet zeker kan zijn dat et nie werkt nu
-$window.keydown(() => {
-  if (!(event.ctrlKey || event.metaKey || event.altKey)) {
-    $currentInput.focus();
-  }
-
-  if (event.which === 13) {
-    if (!username) {
-      setUsername();
-    }
-  }
-});
 
 
 const init = () => {
-  socket.on('login', data => {
-    // connected = true;
-    console.log(data);
-    var message = 'Welcome to HamsterSound';
-    log(message, {
-      prepend: true
-    });
-  });
 
-  socket.on('user joined', data => {
-    log(`${data.username} joined`);
-    console.log(data.username);
-  });
+  if(Modernizr.touch) {
+    console.log("mobile");
+    $.get('/components/mobile.html', _mobile.bind(this));
+  } else {
+    console.log('desktop');
+    $.get('/components/desktop.html', _desktop.bind(this));
+  }
+
 
   socket.on('user left', data => {
     log(`${data.username} left`);
     addParticipantsMessage(data);
   });
 
+  socket.on('drisgedrukt', data => {
+    // renderer.setClearColor('#ffffff', 1);
+    console.log(data);
+    let circle = new THREE.Mesh(geometry, material);
+  scene.add(circle);
+  // render();
+
+  circle.position.x = moveX;
+  circle.position.y = moveY;
+  circle.rotation.x -= 0.05;
+  circle.rotation.y = -1;
+  });
+
 
 };
+
+///////////////////SOCKET/////////////////
+///////////////////SOCKET/////////////////
+///////////////////SOCKET/////////////////
+///////////////////SOCKET/////////////////
+///////////////////SOCKET/////////////////
+///////////////////SOCKET/////////////////
+
+
+const _desktop = htmlCode => {
+  $('body').append($(htmlCode));
+  gamepage();
+
+};
+
+const _mobile = htmlCode => {
+    $('body').append($(htmlCode));
+
+    $(":submit").click(function(e) {
+      e.preventDefault();
+      socket.emit('knopgedrukt', 'mobile');
+    });
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 init();
