@@ -27,20 +27,10 @@ export default class BlueGate extends EventEmitter {
     let {color} = this;
 
     let radius = 300;
-    var geometry = new THREE.TorusGeometry( radius, 50, 20, 5 );
-    let material = new THREE.MeshBasicMaterial({ color: color, wireframe: true});
+    var geometry = new THREE.TorusGeometry( radius, 50, 20, 20 );
+    let material = new THREE.MeshBasicMaterial({ color: color});
     let cube = new THREE.Mesh(geometry, material);
     this.cube = cube;
-
-    let spriteMaterial = new THREE.SpriteMaterial({
-      map: new THREE.TextureLoader().load('../assets/nodemon.png'),
-      color: color, transparent: true, blending: THREE.AdditiveBlending
-    });
-
-    let sprite = new THREE.Sprite( spriteMaterial );
-    sprite.scale.set(500, 500, 1.0);
-    cube.add(sprite);
-
 
     cube.rotation.y = 80;
 

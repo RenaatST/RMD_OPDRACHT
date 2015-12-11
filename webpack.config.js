@@ -44,6 +44,11 @@ module.exports = {
       },
 
       {
+        test: /\.jpg$/,
+        loader: 'file-loader'
+      },
+
+      {
         test: /\.scss$/,
         loader: ExtractTextPlugin.extract('css!postcss!sass?outputStyle=expanded')
       }

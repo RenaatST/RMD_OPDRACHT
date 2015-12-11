@@ -249,16 +249,16 @@ const init = () => {
   });
 
   socket.on('drisgedrukt', data => {
-    // renderer.setClearColor('#ffffff', 1);
-    console.log(data);
-    let circle = new THREE.Mesh(geometry, material);
-  scene.add(circle);
-  // render();
+    gamepage();
+    $('.start-desktop').hide();
 
-  circle.position.x = moveX;
-  circle.position.y = moveY;
-  circle.rotation.x -= 0.05;
-  circle.rotation.y = -1;
+    // console.log(data);
+    // let circle = new THREE.Mesh(geometry, material);
+    // scene.add(circle);
+    // circle.position.x = moveX;
+    // circle.position.y = moveY;
+    // circle.rotation.x -= 0.05;
+    // circle.rotation.y = -1;
   });
 
 
@@ -274,17 +274,24 @@ const init = () => {
 
 const _desktop = htmlCode => {
   $('body').append($(htmlCode));
-  gamepage();
-
 };
 
 const _mobile = htmlCode => {
     $('body').append($(htmlCode));
 
-    $(":submit").click(function(e) {
+    $(".button :submit").click(function(e) {
       e.preventDefault();
       socket.emit('knopgedrukt', 'mobile');
+      $('.start-mobile').hide();
     });
+
+
+    $(".knop :submit").click(function(e) {
+      e.preventDefault();
+      console.log('knop');
+    });
+
+
 };
 
 

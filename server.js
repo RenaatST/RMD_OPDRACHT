@@ -31,6 +31,12 @@ io.on('connection', socket => {
     socket.broadcast.emit('drisgedrukt', socketid);
   });
 
+  socket.on('boost', data => {
+    console.log("boost");
+    //socket.emit('drisgedrukt', socketid);
+    socket.broadcast.emit('goboost', socketid);
+  });
+
   // //na username ingeven
   // socket.on('add user',  username => {
 
