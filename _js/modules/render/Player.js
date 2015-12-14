@@ -9,7 +9,7 @@ export default class Player extends EventEmitter {
     super();
     this.playersocketid = playersocketid;
     this.position = position;
-
+    console.log(playersocketid);
     this._onFrame();
   }
 
@@ -20,8 +20,8 @@ export default class Player extends EventEmitter {
       let {x, y, z} = this.position;
       let {speed} = this;
 
-      this.position.x = speed;
-      this.position.y = 0;
+      this.position.x += speed;
+      this.position.y = y;
       this.position.z = 0;
 
       this.circle.position.x = x;
@@ -66,7 +66,6 @@ export default class Player extends EventEmitter {
     this.speed = speed;
     return this.render();
   }
-
 
 }
 
