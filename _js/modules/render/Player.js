@@ -5,9 +5,9 @@ import EventEmitter from 'eventemitter2';
 
 export default class Player extends EventEmitter {
 
-  constructor(position){
+  constructor(playersocketid, position){
     super();
-
+    this.playersocketid = playersocketid;
     this.position = position;
 
     this._onFrame();

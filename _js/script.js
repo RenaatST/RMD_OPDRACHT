@@ -401,9 +401,11 @@ const init = () => {
     addParticipantsMessage(data);
   });
 
-  socket.on('drisgedrukt', data => {
-    gamepage();
+  socket.on('add_new_user', client => {
     $('.start-desktop').hide();
+
+    makeNewClient(client);
+    //console.log("new user" + data);
   });
 
   socket.on('switch', data => {
@@ -415,6 +417,12 @@ const init = () => {
 
 };
 
+const makeNewClient = client => {
+  console.log("this is client " + client.socketid);
+  let player = new Player(client.socketid, MathUtil.randomPoint(bounds), Player.MOVING);
+  console.log(player);
+}
+
 ///////////////////SOCKET/////////////////
 ///////////////////SOCKET/////////////////
 ///////////////////SOCKET/////////////////
@@ -424,8 +432,8 @@ const init = () => {
 
 
 const _desktop = htmlCode => {
-  // $('body').append($(htmlCode));
-  gamepage();
+  $('body').append($(htmlCode));
+  //gamepage();
   // countdown();
 
 };
@@ -434,20 +442,23 @@ const _mobile = htmlCode => {
 
   $('body').append($(htmlCode));
 
-  $('.button:submit').click(function(e) {
+  $('.button :submit').click(function(e) {
     e.preventDefault();
-    socket.emit('knopgedrukt', 'mobile');
+    socket.emit('new_user', socket.id);
     $('.start-mobile').hide();
+    console.log('start mobile');
   });
 
-  $('.knop1:submit').click(function(e) {
+  $('.knop1 :submit').click(function(e) {
     e.preventDefault();
     console.log('knop');
     socket.emit('boost', 'mobile');
   });
 
-
 };
+
+
+
 
 
 

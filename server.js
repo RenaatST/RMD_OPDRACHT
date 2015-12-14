@@ -1,13 +1,15 @@
 'use strict';
 
-
+var _ = require("underscore-node");
 let express = require('express');
 let app = express();
 let server = require('http').Server(app);
 let io = require('socket.io')(server);
-let users = [];
+let clients = [];
 let port = process.env.PORT || 8080;
 let secret = 'test';
+var Client = require('./models/Client');
+
 
 app.use(express.static(__dirname + '/public'));
 
@@ -15,7 +17,7 @@ app.use(express.static(__dirname + '/public'));
 let socketid;
 
 io.on('connection', socket => {
-
+  var maxid = 0;
   socket.emit("socketid", socket.id);
   socketid = socket.id;
 
@@ -25,10 +27,17 @@ io.on('connection', socket => {
   //   });
 
   // });
-  socket.on('knopgedrukt', data => {
-    console.log("op de knop gedrukt -- SERVER");
-    //socket.emit('drisgedrukt', socketid);
-    socket.broadcast.emit('drisgedrukt', socketid);
+  socket.on('new_user', newUserSocketId => {
+    console.log("Er is een nieuwe user die start game drukt");
+
+    /*if(clients.length > 0){
+      maxid = _.max(clients,function(client){
+        return client.id;
+      }).id;
+    }*/
+    var client  = new Client(maxid + 1,socketid);
+    clients.push(client);
+    socket.broadcast.emit('add_new_user', client);
   });
 
   socket.on('boost', data => {
@@ -64,8 +73,8 @@ io.on('connection', socket => {
 
   socket.on('disconnect', () => {
     socket.broadcast.emit('leave', socketid);
-    users = users.filter(c => c.socketid !== socket.id);
-    console.log(users);
+    clients = clients.filter(c => c.socketid !== socket.id);
+    console.log(clients);
   });
 
 
