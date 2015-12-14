@@ -20,7 +20,6 @@ let connected;
 let $currentInput = $usernameInput.focus();
 let initialized = false;
 let users = [];
-let socketid;
 
 let socket = io();
 
@@ -76,6 +75,11 @@ let particleAttributes;
 let clock = new THREE.Clock();
 let particleTexture = new THREE.TextureLoader().load( '../assets/image/particle.png');
 
+var spelers;
+var adder;
+spelers = [];
+adder = [];
+
 const gamepage = () => {
 
   let AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -110,9 +114,7 @@ const gamepage = () => {
 
 
   gates();
-  newPlayer();
   sound();
-
 };
 
 
@@ -138,8 +140,6 @@ const countdown = () => {
   temp.innerHTML = seconds;
   timeout = setTimeout(countdown, 1000);
 }
-
-
 
 
 
@@ -205,14 +205,23 @@ const gates = () => {
 };
 
 
-
+let ok = false;
 
 const render = () => {
   //player
+
+
   moveY -= 5;
   moveX += 15;
-  player.position.x = -3000 + moveX;
-  player.position.y = moveY;
+
+
+  if(ok){
+    for(let i = 0; i < spelers.length; i++){
+      // scene.add(adder[i]);
+      spelers[i].position.x = -3000 + moveX;
+      spelers[i].position.y = moveY;
+    }
+  }
 
   camera.position.x = moveX;
 
@@ -234,7 +243,6 @@ const render = () => {
       moveCameraDown = false;
     }
   }
-
 
 
   for(let i = 0; i < redGateArrX.length; i++){
@@ -266,8 +274,6 @@ const render = () => {
     // if(switchgate){
     //   scene.add(blueGate._switch());
     // }
-
-
 
   }
 
@@ -306,13 +312,12 @@ const render = () => {
 
   }
   particleGroup.rotation.x = time * 1;
-  particleGroup.position.x = player.position.x-80;
-  particleGroup.position.y = player.position.y+5;
+  // particleGroup.position.x = player.position.x-80;
+  // particleGroup.position.y = player.position.y+5;
 
 
   renderer.render(scene, camera);
   requestAnimationFrame(() => render());
-
 };
 
 
@@ -382,27 +387,26 @@ const detectSound = data => {
 
 const init = () => {
 
-  socket.on("socketid", data => {
 
-    if(initialized === false){
-      socketid = data;
-      if(Modernizr.touch) {
-        $.get('/components/mobile.html', _mobile.bind(this));
 
-      } else {
-        //$.get('/components/mobile.html', _mobile.bind(this));
-         $.get('/components/desktop.html', _desktop.bind(this));
-         gamepage();
-        //_mobile.call(this, socketid);
-      }
-    }
-    initialized = true;
-  });
+  if(Modernizr.touch) {
+    console.log('mobile');
+    $.get('/components/mobile.html', _mobile.bind(this));
+  } else {
+    console.log('desktop');
+    $.get('/components/desktop.html', _desktop.bind(this));
+  }
 
 
   socket.on('user left', data => {
     log(`${data.username} left`);
     addParticipantsMessage(data);
+  });
+
+  socket.on('add_new_user', client => {
+    $('.start-desktop').hide();
+    makeNewClient(client);
+    //console.log("new user" + data);
   });
 
   socket.on('switch', data => {
@@ -414,55 +418,43 @@ const init = () => {
 
 };
 
-const getRandomColor = () => {
-    let letters = '0123456789ABCDEF'.split('');
-    let color = '#';
-    for (let i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-};
 
-
+let speler = true;
 
 const makeNewClient = client => {
-  console.log("this is client " + client.socketid);
-  let speler = true;
-
-  delay(500).then(function() {
+    console.log("this is client " + client.socketid);
+    ok = true;
     player = new Player(client.socketid, MathUtil.randomPoint(bounds), Player.MOVING);
-    if(speler){
-      speler = false;
-    }
-    newPlayer(player);
-  });
-
+    player.type = Player.MOVING;
+    player.move = true;
+    spelers.push(player);
+    adder.push(player._initPlayer(speed));
+    newPlayer();
 }
 
 const newPlayer = () => {
-  player.type = Player.MOVING;
-  player.move = true;
-  scene.add(player.render(getRandomColor(), MathUtil.randomPoint(bounds)));
+  if(ok){
+    for(let i = 0; i < spelers.length; i++){
+      moveY -= 5;
+      moveX += 50;
+      scene.add(adder[i]);
+      spelers[i].position.x = -3000 + moveX;
+      spelers[i].position.y = moveY;
+    }
+  }
 };
 
-///////////////////SOCKET/////////////////
-///////////////////SOCKET/////////////////
-///////////////////SOCKET/////////////////
-///////////////////SOCKET/////////////////
-///////////////////SOCKET/////////////////
-///////////////////SOCKET/////////////////
 
+///////////////////SOCKET/////////////////
+///////////////////SOCKET/////////////////
+///////////////////SOCKET/////////////////
+///////////////////SOCKET/////////////////
+///////////////////SOCKET/////////////////
 
 const _desktop = htmlCode => {
   $('body').append($(htmlCode));
   // countdown();
-  // gamepage();
-
-  socket.on('add_new_user', client => {
-    $('.start-desktop').hide();
-    makeNewClient(client);
-    //console.log("new user" + data);
-  });
+  gamepage();
 };
 
 const _mobile = htmlCode => {
@@ -483,34 +475,6 @@ const _mobile = htmlCode => {
   });
 
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

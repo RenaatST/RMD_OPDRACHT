@@ -5,11 +5,11 @@ import EventEmitter from 'eventemitter2';
 
 export default class Player extends EventEmitter {
 
-  constructor(playersocketid, position, color){
+  constructor(playersocketid, position){
     super();
     this.playersocketid = playersocketid;
     this.position = position;
-    this.color = color;
+    console.log(playersocketid);
     this._onFrame();
   }
 
@@ -20,8 +20,8 @@ export default class Player extends EventEmitter {
       let {x, y, z} = this.position;
       let {speed} = this;
 
-      this.position.x = speed;
-      this.position.y = 0;
+      this.position.x += speed;
+      this.position.y = y;
       this.position.z = 0;
 
       this.circle.position.x = x;
@@ -32,8 +32,9 @@ export default class Player extends EventEmitter {
     requestAnimationFrame(() => this._onFrame());
   }
 
-  render(color, position){
-    let {x, y, z} = position;
+  render(){
+    let {x, y, z} = this.position;
+    let {color} = this;
 
     let material = new THREE.MeshBasicMaterial({color: color});
     var geometry = new THREE.CircleGeometry(30, 1);
@@ -49,7 +50,7 @@ export default class Player extends EventEmitter {
     // var hamster = new THREE.Mesh( geometry, hamsterMaterial );
 
     let sprite = new THREE.Sprite( spriteMaterial );
-    sprite.scale.set(150, 150, 1.0);
+    sprite.scale.set(75, 75, 1.0);
     circle.add(sprite);
 
     circle.position.x = x;
@@ -60,12 +61,11 @@ export default class Player extends EventEmitter {
 
   }
 
-  _initPlayer(speed, color){
-    this.color = color;
+  _initPlayer(speed){
+    this.color = 0x0000FF;
     this.speed = speed;
     return this.render();
   }
-
 
 }
 
