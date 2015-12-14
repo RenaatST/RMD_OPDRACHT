@@ -1,5 +1,6 @@
 'use strict';
 
+
 import EventEmitter from 'eventemitter2';
 
 export default class RedGate extends EventEmitter {
@@ -13,12 +14,12 @@ export default class RedGate extends EventEmitter {
   }
 
   _onFrame(){
+    let {x, y, z} = this.position;
+    z = 0;
 
-
-    this.position.x = 8000;
-    this.position.y = 0;
-    this.position.z = 0;
-
+    this.position.x = x;
+    this.position.y = y;
+    this.position.z = z;
 
     requestAnimationFrame(() => this._onFrame());
   }
@@ -26,25 +27,12 @@ export default class RedGate extends EventEmitter {
   render(){
     let {x, y, z} = this.position;
     let {color} = this;
-    let radius = 300;
 
-    let geometry = new THREE.TorusGeometry(radius, 50, 20, 5 );
-    let material = new THREE.MeshBasicMaterial({ color: color, wireframe: true});
+    var geometry = new THREE.BoxGeometry(100, window.innerHeight, 1);
+    let material = new THREE.MeshBasicMaterial({ color: color});
     let cube = new THREE.Mesh(geometry, material);
     this.cube = cube;
 
-
-    let spriteMaterial = new THREE.SpriteMaterial({
-      map: new THREE.TextureLoader().load('../assets/nodemon.png'),
-      color: color, transparent: true, blending: THREE.AdditiveBlending
-    });
-
-    let sprite = new THREE.Sprite( spriteMaterial );
-    sprite.scale.set(500, 500, 1.0);
-    cube.add(sprite);
-
-
-    cube.rotation.y = 80;
     cube.position.x = x;
     cube.position.y = y;
     cube.position.z = z;
@@ -54,12 +42,20 @@ export default class RedGate extends EventEmitter {
   }
 
   _hitRed(){
-    this.color = 0x949955;
+    this.color = '#DDFFFC';
     return this.render();
   }
 
-  _initRed(){
+  _initRed(posX, posY){
     this.color = 0x990000;
+    this.position.x = posX;
+    this.position.y = posY;
+
+    return this.render();
+  }
+
+  _switch(){
+    this.color = 0x0000FF;
     return this.render();
   }
 

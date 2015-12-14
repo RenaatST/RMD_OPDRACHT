@@ -3,6 +3,7 @@
 import {MathUtil} from './modules/util/';
 import BlueGate from './modules/render/BlueGate';
 import RedGate from './modules/render/RedGate';
+import Player from './modules/render/Player';
 import {html} from './helpers/util';
 
 /////////////SOCKET NODE USER SMARTPHONE/////////////
@@ -27,7 +28,7 @@ let form2 = $('form.usernameform');
 let secretTextBox = form.find('input[type=text]');
 let secretTextBox2 = form2.find('input[type=text]');
 let presentation = $('.gamepage');
-let key = "", animationTimeout;
+let key = '', animationTimeout;
 
 
 ///////////////////////GAME///////////////////////////
@@ -38,6 +39,7 @@ let bounds;
 let geluid = true;
 let recorder = null;
 let recording = true;
+
 let audioInput = null;
 let volume = null;
 let audioContext = null;
@@ -45,17 +47,34 @@ let lastClap = (new Date()).getTime();
 let scene, camera, renderer;
 let moveX = 0;
 let moveY = 0;
-let material = new THREE.MeshBasicMaterial({color: '#F9C224', wireframe: true});
-var geometry = new THREE.SphereGeometry( 50, 1, 1 );
-let circle = new THREE.Mesh(geometry, material);
-var geometryTail = new THREE.SphereGeometry( 5, 32, 32 );
+
 //gates
 let hitRed = true;
 let hitBlue = true;
 let rotation = 0;
-let blueGate = new BlueGate(MathUtil.randomPoint(bounds), rotation);
-let redGate = new RedGate(MathUtil.randomPoint(bounds));
+let moveCameraUp = false;
+let moveCameraDown = false;
+let switchgate = false;
+let redGateArrX = [];
+let redGateArrY = [];
+let redcube = [];
+let redcubehit = [];
+let blueGateArrX = [];
+let blueGateArrY = [];
+let bluecube = [];
+let bluecubehit = [];
+let CameraYboven = 0;
+let CameraYonder = 0;
+let player = new Player(MathUtil.randomPoint(bounds), Player.MOVING);
+let speed = 0;
 
+let blueGate;
+let redGate;
+
+let particleGroup;
+let particleAttributes;
+let clock = new THREE.Clock();
+let particleTexture = new THREE.TextureLoader().load( '../assets/image/particle.png');
 
 const gamepage = () => {
 
@@ -69,11 +88,10 @@ const gamepage = () => {
     border: 40
   };
 
-
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(
-    50, window.innerWidth / window.innerHeight,
-    1, 5000
+    45, window.innerWidth / window.innerHeight,
+    90, 0
   );
 
   renderer = new THREE.WebGLRenderer();
@@ -85,87 +103,223 @@ const gamepage = () => {
 
   document.querySelector('main').appendChild(renderer.domElement);
 
-  camera.position.z = 1900;
-  camera.rotation.y = -0.5;
+  camera.position.z = 4000;
+
+  renderer.setClearColor('#FFAF36', 1);
 
 
-  let spriteMaterial = new THREE.SpriteMaterial({
-    map: new THREE.TextureLoader().load('../assets/nodemon.png'),
-    color: '#ffffff', transparent: false, blending: THREE.AdditiveBlending
-  });
 
-  let sprite = new THREE.Sprite(spriteMaterial);
-  sprite.scale.set(50, 50, 1.0);
-  circle.add(sprite);
-
-  renderer.setClearColor('#010322', 1);
-
-  player();
-  blue();
-  red();
+  gates();
+  newPlayer();
   sound();
 
-
 };
 
 
-const red = () => {
-  scene.add(redGate._initRed());
+
+
+
+const countdown = () => {
+  let seconds;
+  let temp;
+  let timeout;
+
+  seconds = document.getElementById('countdown').style.visibility = "visible";
+  seconds = document.getElementById('countdown').innerHTML;
+  seconds = parseInt(seconds, 10);
+
+  if (seconds == 1) {
+    temp = document.getElementById("countdown").remove();
+    gamepage();
+    return;
+  }
+
+  seconds--;
+  temp = document.getElementById('countdown');
+  temp.innerHTML = seconds;
+  timeout = setTimeout(countdown, 1000);
+}
+
+
+
+
+
+const delay = (ms) => {
+  return new Promise(function (resolve, reject) {
+    setTimeout(resolve, ms);
+  });
 };
 
 
-const blue = () => {
-  scene.add(blueGate._initBlue());
+const flipCamera = () => {
+  console.log('flip');
+  camera.rotation.y = -25;
+  camera.rotation.z = 80.11;
+  camera.position.z = 5500;
+  camera.position.y = -1250;
+  delay(5000).then(function() {
+    normalCamera();
+  });
 };
 
-const player = () => {
-  scene.add(circle);
+
+const normalCamera = () => {
+  console.log('normal');
+  camera.rotation.y = 0;
+  camera.rotation.z = 0;
+  camera.position.z = 4000;
+  camera.position.y = 0;
+};
+
+
+const gates = () => {
+
+  for(let i = 0; i < 10; i++){
+    let random = (3000 * i);
+    let posX = random + MathUtil.randomBetween(1000,2000);
+    let posY2 = 0-window.innerHeight/2;
+    let posY = window.innerHeight-window.innerHeight/2;
+
+    blueGate = new BlueGate(MathUtil.randomPoint(bounds));
+    redGate = new RedGate(MathUtil.randomPoint(bounds));
+
+    redGateArrX.push(posX);
+    blueGateArrX.push(posX);
+
+    redGateArrY.push(posY2);
+    blueGateArrY.push(posY);
+    redGateArrY.push(posY);
+    blueGateArrY.push(posY2);
+
+    scene.add(redGate._initRed(redGateArrX[i], redGateArrY[i]));
+    scene.add(blueGate._initBlue(blueGateArrX[i], blueGateArrY[i]));
+
+    redcube.push(redGate.cube);
+    redcubehit.push(redGate._hitRed());
+    bluecube.push(blueGate.cube);
+    bluecubehit.push(blueGate._hitBlue());
+
+  }
+
   render();
+
 };
+
+
+const newPlayer = () => {
+  player.type = Player.MOVING;
+  player.move = true;
+  scene.add(player._initPlayer(speed));
+};
+
 const render = () => {
   //player
-  moveX += 20;
-  circle.position.x = moveX;
-  circle.position.y = moveY;
-  circle.rotation.x -= 0.05;
-  circle.rotation.y = -1;
+  moveY -= 5;
+  moveX += 15;
+  player.position.x = -3000 + moveX;
+  player.position.y = moveY;
 
-  let materialTail = new THREE.MeshBasicMaterial({color: Math.random() * 0xffffff});
-  let circleTail= new THREE.Mesh(geometryTail, materialTail);
-  scene.add(circleTail);
-  circleTail.position.x = moveX - 35;
-  circleTail.position.y = moveY;
-  circleTail.rotation.y = 0.5;
   camera.position.x = moveX;
-  //redGate
-  let redY1 = redGate.position.y + 275;
-  let redY2 = redGate.position.y - 275;
-  let redX = redGate.position.x;
 
-  if(hitRed){
-    if(redY1 > moveY && redY2 < moveY && redX === moveX){
-      console.log('RED GATE - HIT');
-      scene.remove(redGate.cube);
-      scene.add(redGate._hitRed());
-      hitRed = false;
+  CameraYonder = 2;
+  CameraYboven = 2;
+
+  if(moveCameraDown === false){
+    camera.position.y += CameraYonder;
+    if(camera.position.y >= window.innerHeight/5){
+      moveCameraUp = true;
+      moveCameraDown = true;
     }
   }
 
-  let blueY1 = blueGate.position.y + 275;
-  let blueY2 = blueGate.position.y - 275;
-  let blueX = blueGate.position.x;
-  if(hitBlue){
-    if(blueY1 > moveY && blueY2 < moveY && blueX === moveX){
-      console.log('BLUE GATE - HIT');
-      scene.remove(blueGate.cube);
-      scene.add(blueGate._hitBlue());
-      hitBlue = false;
+  if(moveCameraUp === true){
+    camera.position.y -= CameraYonder;
+    if(camera.position.y <= -window.innerHeight/10){
+      moveCameraUp = false;
+      moveCameraDown = false;
     }
   }
+
+
+
+  for(let i = 0; i < redGateArrX.length; i++){
+
+    let redY1 = redGateArrY[i] + window.innerHeight/2;
+    let redY2 = redGateArrY[i] - window.innerHeight/2;
+    let redX = 3000 + redGateArrX[i];
+
+    if(hitRed){
+      if(redY1 > moveY && redY2 < moveY && redX < moveX){
+        console.log('RED GATE - HIT');
+        scene.remove(redcube[i]);
+        scene.add(redcubehit[i]);
+      }
+
+    }
+
+    let blueY1 = blueGateArrY[i] + window.innerHeight/2;
+    let blueY2 = blueGateArrY[i] - window.innerHeight/2;
+    let blueX = 3000 + blueGateArrX[i];
+    if(hitBlue){
+      if(blueY1 > moveY && blueY2 < moveY && blueX < moveX){
+        console.log('BLUE GATE - HIT');
+        scene.remove(bluecube[i]);
+        scene.add(bluecubehit[i]);
+      }
+    }
+
+    // if(switchgate){
+    //   scene.add(blueGate._switch());
+    // }
+
+
+
+  }
+
+
+  // PARTICLES //
+  particleGroup = new THREE.Object3D();
+  particleAttributes = { startSize: [], startPosition: [], randomness: [] };
+  var totalParticles = 1;
+  var radiusRange = 30;
+
+  for( var i = 0; i < totalParticles; i++ ) {
+    var spriteMaterial = new THREE.SpriteMaterial( { map: particleTexture, color: 0x0000FF} );
+    var sprite = new THREE.Sprite( spriteMaterial );
+    sprite.scale.set( 15, 15, 1.0 ); // imageWidth, imageHeight
+    sprite.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
+
+    sprite.position.setLength( radiusRange * (Math.random() * 0.1 + 0.9) );
+    sprite.material.color.setHSL( Math.random(), Math.random(), Math.random() );
+    // sprite.opacity = 0.80; // translucent particles
+    sprite.material.blending = THREE.AdditiveBlending; // "glowing" particles
+    particleGroup.add(sprite);
+    particleAttributes.startPosition.push(sprite.position.clone());
+    particleAttributes.randomness.push(Math.random());
+  }
+
+  scene.add(particleGroup);
+
+  var time = 4 * clock.getElapsedTime();
+
+  for ( var c = 0; c < particleGroup.children.length; c ++ )
+  {
+    var sprite = particleGroup.children[ c ];
+    var a = particleAttributes.randomness[c] + 10;
+    var pulseFactor = Math.sin(a * time) * 0.1+ 0.5;
+    sprite.position.x = particleAttributes.startPosition[c].x * pulseFactor;
+
+  }
+  particleGroup.rotation.x = time * 1;
+  particleGroup.position.x = player.position.x-80;
+  particleGroup.position.y = player.position.y+5;
+
 
   renderer.render(scene, camera);
   requestAnimationFrame(() => render());
+
 };
+
 
 
 const sound = () => {
@@ -222,12 +376,11 @@ const detectSound = data => {
     if(highAmp > 20){
       lastClap = t;
       moveY += 70;
-    }else{
-      moveY -= 10;
     }
   }
 
   return false;
+
 };
 
 
@@ -235,7 +388,7 @@ const detectSound = data => {
 const init = () => {
 
   if(Modernizr.touch) {
-    console.log("mobile");
+    console.log('mobile');
     $.get('/components/mobile.html', _mobile.bind(this));
   } else {
     console.log('desktop');
@@ -251,14 +404,12 @@ const init = () => {
   socket.on('drisgedrukt', data => {
     gamepage();
     $('.start-desktop').hide();
+  });
 
-    // console.log(data);
-    // let circle = new THREE.Mesh(geometry, material);
-    // scene.add(circle);
-    // circle.position.x = moveX;
-    // circle.position.y = moveY;
-    // circle.rotation.x -= 0.05;
-    // circle.rotation.y = -1;
+  socket.on('switch', data => {
+    let newColor = Math.random() * 0xffffff;
+    renderer.setClearColor(newColor, 1);
+    console.log('boost');
   });
 
 
@@ -273,23 +424,27 @@ const init = () => {
 
 
 const _desktop = htmlCode => {
-  $('body').append($(htmlCode));
+  // $('body').append($(htmlCode));
+  gamepage();
+  // countdown();
+
 };
 
 const _mobile = htmlCode => {
-    $('body').append($(htmlCode));
 
-    $(".button :submit").click(function(e) {
-      e.preventDefault();
-      socket.emit('knopgedrukt', 'mobile');
-      $('.start-mobile').hide();
-    });
+  $('body').append($(htmlCode));
 
+  $('.button:submit').click(function(e) {
+    e.preventDefault();
+    socket.emit('knopgedrukt', 'mobile');
+    $('.start-mobile').hide();
+  });
 
-    $(".knop :submit").click(function(e) {
-      e.preventDefault();
-      console.log('knop');
-    });
+  $('.knop1:submit').click(function(e) {
+    e.preventDefault();
+    console.log('knop');
+    socket.emit('boost', 'mobile');
+  });
 
 
 };

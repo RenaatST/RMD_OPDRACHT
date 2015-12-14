@@ -1,4 +1,5 @@
 'use strict';
 
-export Circle from './Circle';
+export Player from './Player';
 export BlueGate from './BlueGate';
+export RedGate from './RedGate';

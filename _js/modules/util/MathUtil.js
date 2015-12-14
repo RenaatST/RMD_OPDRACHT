@@ -25,6 +25,14 @@ export const color = () => {
 
 };
 
+export const randomX = () => {
+
+  return {
+    x: 100
+  };
+
+};
+
 
 
 export const distanceBetweenPoints = (pos1, pos2) => {
@@ -56,5 +64,6 @@ export default {
   randomBetween,
   distanceBetweenPoints,
   color,
-  randomPoint
+  randomPoint,
+  randomX
 };

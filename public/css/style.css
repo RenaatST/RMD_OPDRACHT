@@ -16,7 +16,8 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #0D0621;
+  background-color: #E8D186;
+  overflow: hidden;
 }
 
 ul {
@@ -249,11 +250,27 @@ strong {
   background: none;
   border: none;
   color: white;
-  font-size: 2em;
+  font-size: 1.2em;
   font-weight: bold;
   margin-left: 25px;
+  margin-top: 240px;
   width: 320px;
   height: 90px;
   border-radius: 15px;
   background-color: #E63637;
+}
+
+.knop1 {
+  margin: 0 auto;
+}
+
+#countdown {
+  padding-top: 150px;
+  font-size: 15em;
+  font-weight: bold;
+  text-align: center;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+  visibility: hidden;
 }

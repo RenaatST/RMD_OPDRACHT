@@ -8,15 +8,17 @@ export default class BlueGate extends EventEmitter {
     super();
 
     this.position = position;
+
     this._onFrame();
   }
 
   _onFrame(){
+    let {x, y, z} = this.position;
+    z = 0;
 
-    this.position.x = 5000;
-    this.position.y = 0;
-    this.position.z = 0;
-
+    this.position.x = x;
+    this.position.y = y;
+    this.position.z = z;
     requestAnimationFrame(() => this._onFrame());
   }
 
@@ -26,32 +28,37 @@ export default class BlueGate extends EventEmitter {
     let {x, y, z} = this.position;
     let {color} = this;
 
-    let radius = 300;
-    var geometry = new THREE.TorusGeometry( radius, 50, 20, 20 );
+    var geometry = new THREE.BoxGeometry(100, window.innerHeight, 1);
     let material = new THREE.MeshBasicMaterial({ color: color});
     let cube = new THREE.Mesh(geometry, material);
+
     this.cube = cube;
-
-    cube.rotation.y = 80;
-
     cube.position.x = x;
     cube.position.y = y;
     cube.position.z = z;
+
     return cube;
   }
 
 
   _hitBlue(){
-    this.color = 0x949955;
+    this.color = '#DDFFFC';
     return this.render();
   }
 
-  _initBlue(){
+  _initBlue(posX, posY2){
     this.color = 0x0000FF;
+    this.position.x = posX;
+    this.position.y = posY2;
     return this.render();
   }
 
 
+  _switch(){
+    console.log('cool');
+    this.color = '#0D0621';
+    return this.render();
+  }
 
 
 }
