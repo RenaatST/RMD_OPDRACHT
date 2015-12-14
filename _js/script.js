@@ -20,6 +20,7 @@ let connected;
 let $currentInput = $usernameInput.focus();
 let initialized = false;
 let users = [];
+let socketid;
 
 let socket = io();
 
@@ -381,24 +382,27 @@ const detectSound = data => {
 
 const init = () => {
 
-  if(Modernizr.touch) {
-    console.log('mobile');
-    $.get('/components/mobile.html', _mobile.bind(this));
-  } else {
-    console.log('desktop');
-    $.get('/components/desktop.html', _desktop.bind(this));
-  }
+  socket.on("socketid", data => {
+
+    if(initialized === false){
+      socketid = data;
+      if(Modernizr.touch) {
+        $.get('/components/mobile.html', _mobile.bind(this));
+
+      } else {
+        //$.get('/components/mobile.html', _mobile.bind(this));
+         $.get('/components/desktop.html', _desktop.bind(this));
+         gamepage();
+        //_mobile.call(this, socketid);
+      }
+    }
+    initialized = true;
+  });
 
 
   socket.on('user left', data => {
     log(`${data.username} left`);
     addParticipantsMessage(data);
-  });
-
-  socket.on('add_new_user', client => {
-    $('.start-desktop').hide();
-    makeNewClient(client);
-    //console.log("new user" + data);
   });
 
   socket.on('switch', data => {
@@ -410,17 +414,27 @@ const init = () => {
 
 };
 
-let speler = true;
+const getRandomColor = () => {
+    let letters = '0123456789ABCDEF'.split('');
+    let color = '#';
+    for (let i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+};
+
+
 
 const makeNewClient = client => {
   console.log("this is client " + client.socketid);
+  let speler = true;
+
   delay(500).then(function() {
     player = new Player(client.socketid, MathUtil.randomPoint(bounds), Player.MOVING);
     if(speler){
-      gamepage();
       speler = false;
     }
-    newPlayer();
+    newPlayer(player);
   });
 
 }
@@ -428,9 +442,8 @@ const makeNewClient = client => {
 const newPlayer = () => {
   player.type = Player.MOVING;
   player.move = true;
-  scene.add(player.render());
+  scene.add(player.render(getRandomColor(), MathUtil.randomPoint(bounds)));
 };
-
 
 ///////////////////SOCKET/////////////////
 ///////////////////SOCKET/////////////////
@@ -444,6 +457,12 @@ const _desktop = htmlCode => {
   $('body').append($(htmlCode));
   // countdown();
   // gamepage();
+
+  socket.on('add_new_user', client => {
+    $('.start-desktop').hide();
+    makeNewClient(client);
+    //console.log("new user" + data);
+  });
 };
 
 const _mobile = htmlCode => {
