@@ -1,6 +1,5 @@
 'use strict';
 
-var _ = require("underscore-node");
 let express = require('express');
 let app = express();
 let server = require('http').Server(app);
