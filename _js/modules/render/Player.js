@@ -15,7 +15,6 @@ export default class Player extends EventEmitter {
 
   _onFrame(){
 
-
     if(this.move && this.type === Player.MOVING){
       let {x, y, z} = this.position;
       let {speed} = this;

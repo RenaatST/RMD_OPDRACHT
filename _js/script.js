@@ -1,40 +1,18 @@
 'use strict';
-// import {html} from './helpers/util';
+
 import {MathUtil} from './modules/util/';
 import BlueGate from './modules/render/BlueGate';
 import RedGate from './modules/render/RedGate';
 import Player from './modules/render/Player';
 import {html} from './helpers/util';
 
-/////////////SOCKET NODE USER SMARTPHONE/////////////
-/////////////SOCKET NODE USER SMARTPHONE/////////////
-/////////////SOCKET NODE USER SMARTPHONE/////////////
-
-let player;
-let $window = $(window);
-let $usernameInput = $('.usernameInput');
-let $loginPage = $('.login.page');
-let $gamepage = $('.game.page');
-let username;
-let connected;
-let $currentInput = $usernameInput.focus();
 let initialized = false;
-let users = [];
-
+let socketid, clients;
 let socket = io();
 
-let form = $('form.login');
-let form2 = $('form.usernameform');
-let secretTextBox = form.find('input[type=text]');
-let secretTextBox2 = form2.find('input[type=text]');
-let presentation = $('.gamepage');
-let key = '', animationTimeout;
+////////////////GAME/////////////////////
 
-
-///////////////////////GAME///////////////////////////
-///////////////////////GAME///////////////////////////
-///////////////////////GAME///////////////////////////
-
+let player;
 let bounds;
 let geluid = true;
 let recorder = null;
@@ -80,7 +58,91 @@ var adder;
 spelers = [];
 adder = [];
 
-const gamepage = () => {
+const init = () => {
+
+  socket.on("socketid", data => {
+
+    if(initialized === false){
+      socketid = data;
+      if(Modernizr.touch) {
+        $.get('/components/mobile.html', _mobile.bind(this));
+        socket.emit('new_user', socket.id);
+      } else {
+        //$.get('/components/mobile.html', _mobile.bind(this));
+         $.get('/components/desktop.html', _desktop.bind(this));
+         console.log('modernizr desktop');
+        //_mobile.call(this, socketid);
+      }
+    }
+    initialized = true;
+  });
+
+  socket.on('nowStartGame', socketid => {
+    makeNewClient(socketid);
+  });
+
+};
+
+const deleteplayer = socketid => {
+  console.log("this is client we need to delete " + socketid);
+
+};
+
+
+
+
+const _desktop = htmlCode => {
+  $('body').append($(htmlCode));
+  startBackgroundFromGame();
+
+
+  socket.on('deleteplayer', socketid => {
+    deleteplayer(socketid);
+  });
+};
+
+const _mobile = htmlCode => {
+  $('body').append($(htmlCode));
+
+  $('.button :submit').click(function(e) {
+    e.preventDefault();
+    //console.log(socket.id);
+    socket.emit('startgame', socket.id);
+    $('.start-mobile').hide();
+
+  });
+};
+
+
+let speler = true;
+
+const makeNewClient = socketid => {
+  //console.log("this is client " + socketid);
+  ok = true;
+  player = new Player(socketid, MathUtil.randomPoint(bounds), Player.MOVING);
+  player.type = Player.MOVING;
+  player.move = true;
+  spelers.push(player);
+  adder.push(player._initPlayer(speed));
+  newPlayer();
+};
+
+
+const newPlayer = () => {
+  if(ok){
+    for(let i = 0; i < spelers.length; i++){
+      moveY -= 5;
+      moveX += 50;
+      scene.add(adder[i]);
+      spelers[i].position.x = -3000 + moveX;
+      spelers[i].position.y = moveY;
+    }
+  }
+};
+
+
+const startBackgroundFromGame = () => {
+  //console.log('game start');
 
   let AudioContext = window.AudioContext || window.webkitAudioContext;
   audioContext = new AudioContext();
@@ -115,59 +177,6 @@ const gamepage = () => {
 
   gates();
   sound();
-};
-
-
-
-
-const countdown = () => {
-  let seconds;
-  let temp;
-  let timeout;
-
-  seconds = document.getElementById('countdown').style.visibility = "visible";
-  seconds = document.getElementById('countdown').innerHTML;
-  seconds = parseInt(seconds, 10);
-
-  if (seconds == 1) {
-    temp = document.getElementById("countdown").remove();
-    gamepage();
-    return;
-  }
-
-  seconds--;
-  temp = document.getElementById('countdown');
-  temp.innerHTML = seconds;
-  timeout = setTimeout(countdown, 1000);
-}
-
-
-
-const delay = (ms) => {
-  return new Promise(function (resolve, reject) {
-    setTimeout(resolve, ms);
-  });
-};
-
-
-const flipCamera = () => {
-  console.log('flip');
-  camera.rotation.y = -25;
-  camera.rotation.z = 80.11;
-  camera.position.z = 5500;
-  camera.position.y = -1250;
-  delay(5000).then(function() {
-    normalCamera();
-  });
-};
-
-
-const normalCamera = () => {
-  console.log('normal');
-  camera.rotation.y = 0;
-  camera.rotation.z = 0;
-  camera.position.z = 4000;
-  camera.position.y = 0;
 };
 
 
@@ -253,7 +262,7 @@ const render = () => {
 
     if(hitRed){
       if(redY1 > moveY && redY2 < moveY && redX < moveX){
-        console.log('RED GATE - HIT');
+        //console.log('RED GATE - HIT');
         scene.remove(redcube[i]);
         scene.add(redcubehit[i]);
       }
@@ -265,7 +274,7 @@ const render = () => {
     let blueX = 3000 + blueGateArrX[i];
     if(hitBlue){
       if(blueY1 > moveY && blueY2 < moveY && blueX < moveX){
-        console.log('BLUE GATE - HIT');
+        //console.log('BLUE GATE - HIT');
         scene.remove(bluecube[i]);
         scene.add(bluecubehit[i]);
       }
@@ -382,100 +391,6 @@ const detectSound = data => {
   return false;
 
 };
-
-
-
-const init = () => {
-
-
-
-  if(Modernizr.touch) {
-    console.log('mobile');
-    $.get('/components/mobile.html', _mobile.bind(this));
-  } else {
-    console.log('desktop');
-    $.get('/components/desktop.html', _desktop.bind(this));
-  }
-
-
-  socket.on('user left', data => {
-    log(`${data.username} left`);
-    addParticipantsMessage(data);
-  });
-
-  socket.on('add_new_user', client => {
-    $('.start-desktop').hide();
-    makeNewClient(client);
-    //console.log("new user" + data);
-  });
-
-  socket.on('switch', data => {
-    let newColor = Math.random() * 0xffffff;
-    renderer.setClearColor(newColor, 1);
-    console.log('boost');
-  });
-
-
-};
-
-
-let speler = true;
-
-const makeNewClient = client => {
-    console.log("this is client " + client.socketid);
-    ok = true;
-    player = new Player(client.socketid, MathUtil.randomPoint(bounds), Player.MOVING);
-    player.type = Player.MOVING;
-    player.move = true;
-    spelers.push(player);
-    adder.push(player._initPlayer(speed));
-    newPlayer();
-}
-
-const newPlayer = () => {
-  if(ok){
-    for(let i = 0; i < spelers.length; i++){
-      moveY -= 5;
-      moveX += 50;
-      scene.add(adder[i]);
-      spelers[i].position.x = -3000 + moveX;
-      spelers[i].position.y = moveY;
-    }
-  }
-};
-
-
-///////////////////SOCKET/////////////////
-///////////////////SOCKET/////////////////
-///////////////////SOCKET/////////////////
-///////////////////SOCKET/////////////////
-///////////////////SOCKET/////////////////
-
-const _desktop = htmlCode => {
-  $('body').append($(htmlCode));
-  // countdown();
-  gamepage();
-};
-
-const _mobile = htmlCode => {
-
-  $('body').append($(htmlCode));
-
-  $('.button :submit').click(function(e) {
-    e.preventDefault();
-    socket.emit('new_user', socket.id);
-    $('.start-mobile').hide();
-    console.log('start mobile');
-  });
-
-  $('.knop1 :submit').click(function(e) {
-    e.preventDefault();
-    console.log('knop');
-    socket.emit('boost', 'mobile');
-  });
-
-};
-
 
 
 init();
