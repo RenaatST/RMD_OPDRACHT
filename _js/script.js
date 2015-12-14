@@ -10,7 +10,7 @@ import {html} from './helpers/util';
 /////////////SOCKET NODE USER SMARTPHONE/////////////
 /////////////SOCKET NODE USER SMARTPHONE/////////////
 
-
+let player;
 let $window = $(window);
 let $usernameInput = $('.usernameInput');
 let $loginPage = $('.login.page');
@@ -65,7 +65,6 @@ let bluecube = [];
 let bluecubehit = [];
 let CameraYboven = 0;
 let CameraYonder = 0;
-let player = new Player(MathUtil.randomPoint(bounds), Player.MOVING);
 let speed = 0;
 
 let blueGate;
@@ -114,7 +113,6 @@ const gamepage = () => {
   sound();
 
 };
-
 
 
 
@@ -206,11 +204,7 @@ const gates = () => {
 };
 
 
-const newPlayer = () => {
-  player.type = Player.MOVING;
-  player.move = true;
-  scene.add(player._initPlayer(speed));
-};
+
 
 const render = () => {
   //player
@@ -403,7 +397,6 @@ const init = () => {
 
   socket.on('add_new_user', client => {
     $('.start-desktop').hide();
-
     makeNewClient(client);
     //console.log("new user" + data);
   });
@@ -417,11 +410,27 @@ const init = () => {
 
 };
 
+let speler = true;
+
 const makeNewClient = client => {
   console.log("this is client " + client.socketid);
-  let player = new Player(client.socketid, MathUtil.randomPoint(bounds), Player.MOVING);
-  console.log(player);
+  delay(500).then(function() {
+    player = new Player(client.socketid, MathUtil.randomPoint(bounds), Player.MOVING);
+    if(speler){
+      gamepage();
+      speler = false;
+    }
+    newPlayer();
+  });
+
 }
+
+const newPlayer = () => {
+  player.type = Player.MOVING;
+  player.move = true;
+  scene.add(player.render());
+};
+
 
 ///////////////////SOCKET/////////////////
 ///////////////////SOCKET/////////////////
@@ -433,9 +442,8 @@ const makeNewClient = client => {
 
 const _desktop = htmlCode => {
   $('body').append($(htmlCode));
-  //gamepage();
   // countdown();
-
+  // gamepage();
 };
 
 const _mobile = htmlCode => {

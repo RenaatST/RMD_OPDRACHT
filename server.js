@@ -40,6 +40,7 @@ io.on('connection', socket => {
     socket.broadcast.emit('add_new_user', client);
   });
 
+
   socket.on('boost', data => {
     console.log("boost");
     //socket.emit('drisgedrukt', socketid);
