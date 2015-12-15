@@ -309,8 +309,6 @@ const makeNewClient = client => {
 };
 
 
-
-
 const startBackgroundFromGame = () => {
 
   bounds = {

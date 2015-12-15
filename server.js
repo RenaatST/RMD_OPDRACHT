@@ -23,9 +23,6 @@ io.on('connection', socket => {
     io.emit('yfromplayergoesup', posY, socketid);
   });
 
-
-
-
   socket.on('startgame', data => {
     console.log("startgame");
 
