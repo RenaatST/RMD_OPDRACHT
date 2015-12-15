@@ -13,9 +13,17 @@ export default class Player extends EventEmitter {
     this.positionY = 100;
     this.color = color;
 
-    console.log(playersocketid);
-    console.log(positionX);
-    console.log(positionY);
+
+    console.log('zonder this' + playersocketid);
+    console.log('zonder this' + color);
+    console.log('zonder this' + positionX);
+    console.log('zonder this' + positionY);
+
+    console.log('met this' + this.playersocketid);
+    console.log('met this' + this.color);
+    console.log('met this' + this.positionX);
+    console.log('met this' + this.positionY);
+
 
     this.render();
 

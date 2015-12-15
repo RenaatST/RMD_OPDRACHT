@@ -337,10 +337,9 @@ const makeNewClient = client => {
 
   console.log('thisIsANewSpeler' + client.color);
   let player = new Player(client.socketid, client.color, MathUtil.randomPoint(bounds).x, MathUtil.randomPoint(bounds).y);
+
   scene.add(player.render());
-
-
-  // //console.log("this is client " + socketid);
+  console.log("this is client " + client);
   // ok = true;
   // player = new Player(socketid, MathUtil.randomPoint(bounds).x, MathUtil.randomPoint(bounds).y, Player.MOVING);
   // spelers.push(player);

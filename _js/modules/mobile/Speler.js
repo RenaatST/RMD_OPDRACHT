@@ -10,10 +10,7 @@ export default class Speler extends EventEmitter {
     this.socketid = socketid;
     this.color = color;
 
-    console.log('dit is de speler ' + this.socketid + ' met kleur ' + this.color);
-
-
-
+    console.log('dit is speler ' + this.socketid + ' met kleur ' + this.color);
 
   }
 

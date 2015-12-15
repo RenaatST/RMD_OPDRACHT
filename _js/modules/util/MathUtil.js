@@ -16,6 +16,7 @@ export const randomPoint = bounds => {
 };
 
 export const randomColor = () => {
+  console.log("kgon ier ki twa random van maken");
 
   let letters = '0123456789ABCDEF'.split('');
   let color = '#';

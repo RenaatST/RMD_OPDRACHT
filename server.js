@@ -35,6 +35,7 @@ io.on('connection', socket => {
     socket.broadcast.emit('thisIsANewSpeler', client);
 
     clients.push(client);
+    console.log(clients);
 
   });
 
