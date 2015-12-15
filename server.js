@@ -31,19 +31,19 @@ io.on('connection', socket => {
 
   socket.on('startgame', data => {
 
+
     let client  = new Client(data.socketid, data.color);
     socket.broadcast.emit('thisIsANewSpeler', client);
 
     clients.push(client);
-    console.log(clients);
+
 
   });
 
   socket.on('disconnect', () => {
-    console.log('client logout ' + socket.id);
-    socket.broadcast.emit('deleteplayer', socketid);
-
     clients = clients.filter(c => c.socketid !== socket.id);
+    socket.broadcast.emit('removePlayer', socket.id);
+
   });
 
 });

@@ -56,9 +56,7 @@ let clock = new THREE.Clock();
 let particleTexture = new THREE.TextureLoader().load( '../assets/image/particle.png');
 
 let spelers;
-let adder;
 spelers = [];
-adder = [];
 
 
 const gates = () => {
@@ -212,71 +210,9 @@ const render = () => {
 
 
 
-const sound = () => {
-
-  navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-
-  if(navigator.getUserMedia){
-
-    navigator.getUserMedia({
-      audio: true
-    },
-
-    e => {
-      volume = audioContext.createGain(); // creates a gain node
-      audioInput = audioContext.createMediaStreamSource(e); // creates an audio node from the mic stream
-      audioInput.connect(volume);// connect the stream to the gain node
-      recorder = audioContext.createScriptProcessor(2048, 1, 1);
-
-      recorder.onaudioprocess = b =>{
-        if(!recording) return;
-        let left = b.inputBuffer.getChannelData(0);
-        // let right = e.inputBuffer.getChannelData(1);
-        detectSound(left);
-      };
-
-      volume.connect(recorder);// connect the recorder
-      recorder.connect(audioContext.destination);
-    },
-    () => { //failure
-      let customAlert;
-      customAlert('Error capturing audio.');
-    });
-
-  } else {
-    let customAlert;
-    customAlert('getUserMedia not supported in this browser.');
-  }
-
-};
-
-
-const detectSound = data => {
-
-  let t = (new Date()).getTime(); //krijg tijd binnen
-  if(t - lastClap < 10) return false;
-
-  let zeroCrossings = 0, highAmp = 0;
-  for(let i = 1; i < data.length; i++){
-    if(Math.abs(data[i]) > 0.25) highAmp++;
-    if(data[i] > 0 && data[i-1] < 0 || data[i] < 0 && data[i-1] > 0) zeroCrossings++;
-  }
-
-  if(geluid){
-    if(highAmp > 20){
-      lastClap = t;
-      moveY += 70;
-    }
-  }
-
-  return false;
-
-};
 
 
 const init = () => {
-
-  console.log("init");
 
   socket.on("socketid", data => {
 
@@ -303,7 +239,17 @@ const init = () => {
 
 const deleteplayer = socketid => {
   console.log("this is client we need to delete " + socketid);
+  if (spelers !== []) {
+    spelers.forEach(function(speler) {
+        if (speler.getSocketId() === socketid){
+          console.log("removed: " + socketid);
+          console.log(speler);
 
+          scene.remove(speler.circle);
+        }
+    });
+    console.log(spelers.length);
+  }
 };
 
 
@@ -314,32 +260,29 @@ const _desktop = htmlCode => {
   startBackgroundFromGame();
 
 
-  socket.on('deleteplayer', socketid => {
+
+  socket.on('removePlayer', socketid => {
     deleteplayer(socketid);
   });
 };
 
 const _mobile = htmlCode => {
   $('body').append($(htmlCode));
-
   let mobile = new Mobile(socket, socketid);
 
-
 };
-
-
-let speler = true;
-
 
 
 const makeNewClient = client => {
 
 
   console.log('thisIsANewSpeler' + client.color);
-  let player = new Player(client.socketid, client.color, MathUtil.randomPoint(bounds).x, MathUtil.randomPoint(bounds).y);
-
+  let player = new Player(client.socketid, client.color); //, MathUtil.randomPoint(bounds).x, MathUtil.randomPoint(bounds).y);
+  spelers.push(player);
   scene.add(player.render());
-  console.log("this is client " + client);
+
+
+  // //console.log("this is client " + socketid);
   // ok = true;
   // player = new Player(socketid, MathUtil.randomPoint(bounds).x, MathUtil.randomPoint(bounds).y, Player.MOVING);
   // spelers.push(player);
@@ -371,8 +314,6 @@ const newPlayer = player => {
 const startBackgroundFromGame = () => {
   //console.log('game start');
 
-  let AudioContext = window.AudioContext || window.webkitAudioContext;
-  audioContext = new AudioContext();
 
   bounds = {
     width: window.innerWidth,
@@ -403,7 +344,7 @@ const startBackgroundFromGame = () => {
 
 
   gates();
-  sound();
+  //sound();
 };
 
 
