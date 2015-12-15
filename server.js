@@ -19,16 +19,15 @@ io.on('connection', socket => {
   socketid = socket.id;
   socket.emit("socketid",socket.id);
 
-  socket.on('upY', data => {
-    socket.emit('playerupPosChange', data);
+  socket.on('ygoesup', (posY, socketid) => {
+    io.emit('yfromplayergoesup', posY, socketid);
   });
 
-  socket.on('downY', data => {
-    socket.emit('playerdownPosChange', data);
-  });
+
+
 
   socket.on('startgame', data => {
-
+    console.log("startgame");
 
     let client  = new Client(data.socketid, data.color);
     socket.broadcast.emit('thisIsANewSpeler', client);
@@ -43,6 +42,8 @@ io.on('connection', socket => {
     socket.broadcast.emit('removePlayer', socket.id);
 
   });
+
+
 
 });
 

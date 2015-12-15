@@ -216,7 +216,9 @@ const init = () => {
 
 
 
-
+  socket.on("ditisiets", data => {
+    console.log('dit is iets');
+  });
 
   socket.on("socketid", data => {
 
@@ -224,20 +226,20 @@ const init = () => {
       socketid = data;
       if(Modernizr.touch) {
         $.get('/components/mobile.html', _mobile.bind(this));
-        //socket.emit('new_user', socket.id);
       } else {
-        //$.get('/components/mobile.html', _mobile.bind(this));
          $.get('/components/desktop.html', _desktop.bind(this));
-         console.log('modernizr desktop');
-        //_mobile.call(this, socketid);
       }
     }
     initialized = true;
   });
 
   socket.on('thisIsANewSpeler', client => {
+
     makeNewClient(client);
   });
+
+
+
 
 };
 
@@ -263,15 +265,25 @@ const _desktop = htmlCode => {
   $('body').append($(htmlCode));
   startBackgroundFromGame();
 
-
-
   socket.on('removePlayer', socketid => {
     deleteplayer(socketid);
   });
 
 
-  socket.on('playerupPosChange', data => {
-    console.log("uuuuup" + data);
+  socket.on('yfromplayergoesup', (posY, socketid) => {
+    if (spelers !== []) {
+      spelers.forEach(function(speler) {
+          if (speler.getSocketId() === socketid){
+            console.log(posY);
+            console.log(socketid);
+
+            speler.circle.position.y = posY;
+
+
+          }
+      });
+    }
+
     //console.log('player ' + socketidplayerchanged + ' changed y ' + ypos);
   });
 
@@ -279,6 +291,8 @@ const _desktop = htmlCode => {
     console.log("doooooooown" + data);
     //console.log('player ' + socketidplayerchanged + ' changed y ' + ypos);
   });
+
+
 
 };
 
@@ -289,13 +303,9 @@ const _mobile = htmlCode => {
 
 
 const makeNewClient = client => {
-
-
-  console.log('thisIsANewSpeler' + client.color);
-  let player = new Player(socket, client.socketid, client.color); //, MathUtil.randomPoint(bounds).x, MathUtil.randomPoint(bounds).y);
+  let player = new Player(socket, client.socketid, client.color);
   spelers.push(player);
   scene.add(player.render());
-
 };
 
 

@@ -149,21 +149,20 @@ export default class Player extends EventEmitter {
     }else{
       this.downY();
     }
-    return false;
 
+    return false;
   }
 
 
   upY(){
     this.positionY += 15;
-    this.socket.emit('upY', this.positionY);
+    this.socket.emit('ygoesup', this.positionY, this.playersocketid);
   }
 
   downY(){
     this.positionY -= 15;
-    this.socket.emit('downY', this.positionY);
+    //this.socket.emit('downY', this.positionY);
   }
-
 }
 
 
