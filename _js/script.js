@@ -214,6 +214,10 @@ const render = () => {
 
 const init = () => {
 
+
+
+
+
   socket.on("socketid", data => {
 
     if(initialized === false){
@@ -264,12 +268,23 @@ const _desktop = htmlCode => {
   socket.on('removePlayer', socketid => {
     deleteplayer(socketid);
   });
+
+
+  socket.on('playerupPosChange', data => {
+    console.log("uuuuup" + data);
+    //console.log('player ' + socketidplayerchanged + ' changed y ' + ypos);
+  });
+
+  socket.on('playerdownPosChange', data => {
+    console.log("doooooooown" + data);
+    //console.log('player ' + socketidplayerchanged + ' changed y ' + ypos);
+  });
+
 };
 
 const _mobile = htmlCode => {
   $('body').append($(htmlCode));
   let mobile = new Mobile(socket, socketid);
-
 };
 
 
@@ -277,43 +292,16 @@ const makeNewClient = client => {
 
 
   console.log('thisIsANewSpeler' + client.color);
-  let player = new Player(client.socketid, client.color); //, MathUtil.randomPoint(bounds).x, MathUtil.randomPoint(bounds).y);
+  let player = new Player(socket, client.socketid, client.color); //, MathUtil.randomPoint(bounds).x, MathUtil.randomPoint(bounds).y);
   spelers.push(player);
   scene.add(player.render());
 
-
-  // //console.log("this is client " + socketid);
-  // ok = true;
-  // player = new Player(socketid, MathUtil.randomPoint(bounds).x, MathUtil.randomPoint(bounds).y, Player.MOVING);
-  // spelers.push(player);
-  // //adder.push(player._initPlayer(speed));
-  // newPlayer(player);
 };
 
-const newPlayer = player => {
-  // scene.add(player._initPlayer());
-  // player.position.x = moveX;
-  // player.position.y = moveY;
-
-  //player.position.x = player.position.x + moveX;
-  //player.position.y = player.position.y;
-
-  /*if(ok){
-    for(let i = 0; i < spelers.length; i++){
-      //moveY -= 5;
-      //moveX += 50;
-      scene.add(adder[i]);
-      spelers[i].position.x = player.position.x + moveX;
-      spelers[i].position.y = moveY;
-    }
-  }*/
-};
 
 
 
 const startBackgroundFromGame = () => {
-  //console.log('game start');
-
 
   bounds = {
     width: window.innerWidth,

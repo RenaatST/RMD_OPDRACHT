@@ -19,15 +19,13 @@ io.on('connection', socket => {
   socketid = socket.id;
   socket.emit("socketid",socket.id);
 
-  /*socket.on('new_user', newUserSocketId => {
+  socket.on('upY', data => {
+    socket.emit('playerupPosChange', data);
+  });
 
-    console.log("client login: " + newUserSocketId);
-
-    var client  = new Client(socketid);
-    clients.push(client);
-    console.log(clients);
-    socket.broadcast.emit('add_new_user', client);
-  });*/
+  socket.on('downY', data => {
+    socket.emit('playerdownPosChange', data);
+  });
 
   socket.on('startgame', data => {
 

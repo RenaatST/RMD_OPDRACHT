@@ -5,8 +5,9 @@ import EventEmitter from 'eventemitter2';
 
 export default class Player extends EventEmitter {
 
-  constructor(playersocketid, color){
+  constructor(socket, playersocketid, color){
     super();
+    this.socket = socket;
 
     let volume;
     let audioInput;
@@ -127,6 +128,10 @@ export default class Player extends EventEmitter {
     return this.playersocketid;
   }
 
+  isMovingWithId(){
+
+    return this.positionY;
+  }
 
   detectSound(data){
 
@@ -140,14 +145,10 @@ export default class Player extends EventEmitter {
     }
 
     if(highAmp > 20){
-      //this.soundTriggeredY += 70;
-
       this.upY();
     }else{
       this.downY();
-
     }
-
     return false;
 
   }
@@ -155,16 +156,12 @@ export default class Player extends EventEmitter {
 
   upY(){
     this.positionY += 15;
-    console.log(this.positionY);
-
-
+    this.socket.emit('upY', this.positionY);
   }
 
   downY(){
     this.positionY -= 15;
-    console.log(this.positionY);
-
-
+    this.socket.emit('downY', this.positionY);
   }
 
 }
