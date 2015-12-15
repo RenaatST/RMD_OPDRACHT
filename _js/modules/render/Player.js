@@ -5,48 +5,57 @@ import EventEmitter from 'eventemitter2';
 
 export default class Player extends EventEmitter {
 
-  constructor(playersocketid, position){
+  constructor(playersocketid, positionX, positionY ){
     super();
+
     this.playersocketid = playersocketid;
-    this.position = position;
+    this.positionX = positionX;
+    this.positionY = positionY;
+
     console.log(playersocketid);
-    this._onFrame();
+    console.log(positionX);
+    console.log(positionY);
+
+    this.render();
+
+
   }
 
   _onFrame(){
 
-    if(this.move && this.type === Player.MOVING){
-      let {x, y, z} = this.position;
-      let {speed} = this;
+    //let {x, y, z} = this.position;
+    let x = this.positionX;
+    let y = this.positionY;
 
-      this.position.x += speed;
-      this.position.y = y;
-      this.position.z = 0;
+    this.positionX += 2;
+    this.positionY += 2;
 
-      this.circle.position.x = x;
-      this.circle.position.y = y;
-      this.circle.position.z = z;
-    }
+
+    this.circle.position.x = x;
+    this.circle.position.y = y;
+
+    // this.circle.position.x = x;
+    // this.circle.position.y = y;
+    // this.circle.position.z = z;
+
 
     requestAnimationFrame(() => this._onFrame());
   }
 
   render(){
-    let {x, y, z} = this.position;
-    let {color} = this;
+    let x = this.positionX;
+    let y = this.positionY;
 
-    let material = new THREE.MeshBasicMaterial({color: color});
+
+    let material = new THREE.MeshBasicMaterial({color: 0x0000FF});
     var geometry = new THREE.CircleGeometry(30, 1);
     let circle = new THREE.Mesh(geometry, material);
     this.circle = circle;
 
     let spriteMaterial = new THREE.SpriteMaterial({
       map: new THREE.TextureLoader().load('../assets/image/nodemon.png'),
-      color: color, transparent: true, blending: THREE.AdditiveBlending
+      color: 0x0000FF, transparent: true, blending: THREE.AdditiveBlending
     });
-    // var hamsterTexture = new THREE.TextureLoader().load('../assets/image/hamster.png');
-    // var hamsterMaterial = new THREE.MeshBasicMaterial( { map: hamsterTexture, transparent: true } );
-    // var hamster = new THREE.Mesh( geometry, hamsterMaterial );
 
     let sprite = new THREE.Sprite( spriteMaterial );
     sprite.scale.set(75, 75, 1.0);
@@ -54,7 +63,7 @@ export default class Player extends EventEmitter {
 
     circle.position.x = x;
     circle.position.y = y;
-    circle.position.z = z;
+    this._onFrame();
 
     return circle;
 
@@ -67,5 +76,3 @@ export default class Player extends EventEmitter {
   }
 
 }
-
-Player.MOVING = 'moving';
