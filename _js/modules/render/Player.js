@@ -5,12 +5,13 @@ import EventEmitter from 'eventemitter2';
 
 export default class Player extends EventEmitter {
 
-  constructor(playersocketid, positionX, positionY ){
+  constructor(playersocketid, color, positionX, positionY){
     super();
 
     this.playersocketid = playersocketid;
-    this.positionX = positionX;
-    this.positionY = positionY;
+    this.positionX = 100;
+    this.positionY = 100;
+    this.color = color;
 
     console.log(playersocketid);
     console.log(positionX);
@@ -45,16 +46,16 @@ export default class Player extends EventEmitter {
   render(){
     let x = this.positionX;
     let y = this.positionY;
+    let color = this.color;
 
-
-    let material = new THREE.MeshBasicMaterial({color: 0x0000FF});
+    let material = new THREE.MeshBasicMaterial({color: color});
     var geometry = new THREE.CircleGeometry(30, 1);
     let circle = new THREE.Mesh(geometry, material);
     this.circle = circle;
 
     let spriteMaterial = new THREE.SpriteMaterial({
       map: new THREE.TextureLoader().load('../assets/image/nodemon.png'),
-      color: 0x0000FF, transparent: true, blending: THREE.AdditiveBlending
+      color: color, transparent: true, blending: THREE.AdditiveBlending
     });
 
     let sprite = new THREE.Sprite( spriteMaterial );

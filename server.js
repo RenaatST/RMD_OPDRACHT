@@ -19,7 +19,7 @@ io.on('connection', socket => {
   socketid = socket.id;
   socket.emit("socketid",socket.id);
 
-  socket.on('new_user', newUserSocketId => {
+  /*socket.on('new_user', newUserSocketId => {
 
     console.log("client login: " + newUserSocketId);
 
@@ -27,10 +27,17 @@ io.on('connection', socket => {
     clients.push(client);
     console.log(clients);
     socket.broadcast.emit('add_new_user', client);
-  });
+  });*/
 
-  socket.on('startgame', socketid => {
-    socket.broadcast.emit('nowStartGame', socketid);
+  socket.on('startgame', data => {
+
+
+    let client  = new Client(data.socketid, data.color);
+    socket.broadcast.emit('thisIsANewSpeler', client);
+
+    clients.push(client);
+
+
   });
 
   socket.on('disconnect', () => {

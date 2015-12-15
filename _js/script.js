@@ -5,6 +5,8 @@ import BlueGate from './modules/render/BlueGate';
 import RedGate from './modules/render/RedGate';
 import Player from './modules/render/Player';
 import {html} from './helpers/util';
+import Mobile from './modules/mobile/Mobile';
+
 
 let initialized = false;
 let socketid, clients;
@@ -280,7 +282,7 @@ const init = () => {
       socketid = data;
       if(Modernizr.touch) {
         $.get('/components/mobile.html', _mobile.bind(this));
-        socket.emit('new_user', socket.id);
+        //socket.emit('new_user', socket.id);
       } else {
         //$.get('/components/mobile.html', _mobile.bind(this));
          $.get('/components/desktop.html', _desktop.bind(this));
@@ -291,8 +293,8 @@ const init = () => {
     initialized = true;
   });
 
-  socket.on('nowStartGame', socketid => {
-    makeNewClient(socketid);
+  socket.on('thisIsANewSpeler', client => {
+    makeNewClient(client);
   });
 
 };
@@ -318,23 +320,24 @@ const _desktop = htmlCode => {
 const _mobile = htmlCode => {
   $('body').append($(htmlCode));
 
-  $('.button :submit').click(function(e) {
-    e.preventDefault();
-    //console.log(socket.id);
-    socket.emit('startgame', socket.id);
-    $('.start-mobile').hide();
+  let mobile = new Mobile(socket, socketid);
 
-  });
+
 };
 
 
 let speler = true;
 
-const makeNewClient = socketid => {
 
-  let player = new Player(socketid, MathUtil.randomPoint(bounds).x, MathUtil.randomPoint(bounds).y);
-  console.log(player);
+
+const makeNewClient = client => {
+
+
+  console.log('thisIsANewSpeler' + client.color);
+  let player = new Player(client.socketid, client.color, MathUtil.randomPoint(bounds).x, MathUtil.randomPoint(bounds).y);
   scene.add(player.render());
+
+
   // //console.log("this is client " + socketid);
   // ok = true;
   // player = new Player(socketid, MathUtil.randomPoint(bounds).x, MathUtil.randomPoint(bounds).y, Player.MOVING);

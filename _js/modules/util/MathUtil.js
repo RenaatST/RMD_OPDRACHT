@@ -15,24 +15,16 @@ export const randomPoint = bounds => {
 
 };
 
+export const randomColor = () => {
 
-
-export const color = () => {
-
-  return {
-    color: 0x0000FF
-  };
-
-};
-
-export const randomX = () => {
-
-  return {
-    x: 100
-  };
+  let letters = '0123456789ABCDEF'.split('');
+  let color = '#';
+  for (let i = 0; i < 6; i++ ) {
+      color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
 
 };
-
 
 
 export const distanceBetweenPoints = (pos1, pos2) => {
@@ -63,7 +55,6 @@ export const randomBetween = (min, max, round=true, signed=false) => {
 export default {
   randomBetween,
   distanceBetweenPoints,
-  color,
   randomPoint,
-  randomX
+  randomColor
 };
