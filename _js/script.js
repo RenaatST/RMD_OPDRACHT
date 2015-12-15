@@ -276,6 +276,8 @@ const detectSound = data => {
 
 const init = () => {
 
+  console.log("init");
+
   socket.on("socketid", data => {
 
     if(initialized === false){

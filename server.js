@@ -31,12 +31,10 @@ io.on('connection', socket => {
 
   socket.on('startgame', data => {
 
-
     let client  = new Client(data.socketid, data.color);
     socket.broadcast.emit('thisIsANewSpeler', client);
 
     clients.push(client);
-
 
   });
 
