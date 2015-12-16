@@ -62,19 +62,6 @@ io.on('connection', socket => {
       });
     }
 
-
-    // loginWord2 = key;
-    // firstSocketId = socketidMobile;
-
-    // if(loginWord === loginWord2){
-    //   console.log("dit is mobile met id " + firstSocketId + " and connected to desktop id " + secondSocketId);
-    //   let client  = new Client(firstSocketId, secondSocketId, 'red');
-    //   //socket.emit('thisIsANewSpeler', client);
-    //   socket.broadcast.emit('newplayer', client);
-    //   io.to(secondSocketId).emit('thisIsANewSpeler', client);
-
-    // };
-
   });
 
 
@@ -82,9 +69,9 @@ io.on('connection', socket => {
 
 
   socket.on('movePlayerUp', player => {
-    io.emit('thisPlayerUp', player);
+    socket.broadcast.emit('thisPlayerUp', player);
 
-    console.log('updat this player server');
+
   });
 
   socket.on('disconnect', () => {
