@@ -309,6 +309,7 @@ const makeNewClient = client => {
   let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
   scene.add(player.render());
   sound(player);
+  socket.emit('nowBroadcastPlayerToAllPlayers', player);
 };
 
 const detectSound = (data, player) => {

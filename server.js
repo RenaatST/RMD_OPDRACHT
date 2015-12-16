@@ -22,6 +22,8 @@ app.use(express.static(__dirname + '/public'));
 io.on('connection', socket => {
   socketid = socket.id;
 
+  console.log(arrayMetKeys);
+
   socket.emit("socketid",socket.id);
 
   socket.on('yPosDown', (playerposY, playerId) => {
@@ -49,7 +51,7 @@ io.on('connection', socket => {
           console.log("dit is mobile met id " + firstSocketId + " and connected to desktop id " + secondSocketId);
 
           let client  = new Client(firstSocketId, secondSocketId, randomColor());
-          socket.broadcast.emit('newplayer', client);
+
           io.to(secondSocketId).emit('thisIsANewSpeler', client);
 
           console.log("all keys before " + arrayMetKeys);
@@ -65,14 +67,10 @@ io.on('connection', socket => {
   });
 
 
-
-
-
-  socket.on('movePlayerUp', player => {
-    socket.broadcast.emit('thisPlayerUp', player);
-
-
+  socket.on('nowBroadcastPlayerToAllPlayers', client => {
+    socket.broadcast.emit('newplayer', client);
   });
+
 
   socket.on('disconnect', () => {
     clients = clients.filter(c => c.socketid !== socket.id);
