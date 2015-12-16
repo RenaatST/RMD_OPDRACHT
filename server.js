@@ -24,10 +24,6 @@ io.on('connection', socket => {
   socket.emit("socketid",socket.id);
 
 
-  socket.on('newplayer', client => {
-    socket.broadcast.emit('newplayerToEveryone', client);
-  });
-
   socket.on('ditIsMobileSocket', (key, socketidMobile) => {
 
     loginWord2 = key;
@@ -37,12 +33,21 @@ io.on('connection', socket => {
       console.log("dit is mobile met id " + firstSocketId + " and connected to desktop id " + secondSocketId);
       let client  = new Client(firstSocketId, secondSocketId, 'red');
       //socket.emit('thisIsANewSpeler', client);
+      socket.broadcast.emit('newplayer', client);
       io.to(secondSocketId).emit('thisIsANewSpeler', client);
 
       //clients.push(client);
     };
 
     //console.log(firstSocketId);
+  });
+
+  socket.on('yPosDown', (playerposY, playerId) => {
+    socket.broadcast.emit('yPosupdateDown', playerposY, playerId);
+  });
+
+  socket.on('yPosUp', (playerposY, playerId) => {
+    socket.broadcast.emit('yPosupdate', playerposY, playerId);
   });
 
   socket.on('ditIsDesktopSocket', (key, socketidDesktop) => {

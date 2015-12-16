@@ -11,6 +11,7 @@ import Mobile from './modules/mobile/Mobile';
 let initialized = false;
 let socketid, clients;
 let socket = io();
+let ownplayer;
 
 let socketidMobile;
 let socketidDesktop;
@@ -236,21 +237,31 @@ const init = () => {
 
 
 
-  socket.on('newplayerToEveryone', client => {
-    scene.add(client.render());
-  });
 
   socket.on('thisIsANewSpeler', client => {
     makeNewClient(client);
   });
 
 
-  socket.on('thisPlayerUp', thisplayer => {
+  socket.on('yPosupdateDown', (thisY, playerId ) => {
+    console.log(thisY + " playerid " + playerId);
+
     if (spelers !== []) {
       spelers.forEach(function(speler) {
-        if (speler.getSocketId() === thisplayer.socketid){
+        if (speler.getSocketId() === playerId){
+          speler.positionY = thisY;
+        }
+      });
+    }
+  });
 
-          speler.positionY = 300;
+  socket.on('yPosupdate', (thisY, playerId ) => {
+    console.log(thisY + " playerid " + playerId);
+
+    if (spelers !== []) {
+      spelers.forEach(function(speler) {
+        if (speler.getSocketId() === playerId){
+          speler.positionY = thisY;
         }
       });
     }
@@ -310,17 +321,14 @@ const _desktop = htmlCode => {
 
   socket.emit('ditIsDesktopSocket', code, socketidDesktop);
 
-
-
-
-
-  // $('.login2 :submit').click(function(e) {
-  //   e.preventDefault();
-
-  //   let key = $('.login2').find('input[type=text]').val().trim();
-
-  // });
-
+  socket.on('newplayer', client => {
+    if(socketidDesktop !== client.socketidDesktop){
+      let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
+      spelers.push(player);
+      scene.add(player.render());
+      console.log('naar iedereen: deze speler is toegevoegd ' + player.playersocketid);
+    }
+  });
 
 
 };
@@ -343,14 +351,12 @@ const _mobile = htmlCode => {
 
 const makeNewClient = client => {
 
-  let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
-  spelers.push(player);
-  scene.add(player.render());
-  socket.emit('newplayer', player);
-  sound();
+  ownplayer = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
+  scene.add(ownplayer.render());
+  sound(ownplayer);
 };
 
-const detectSound = data => {
+const detectSound = (data, player) => {
 
   let t = (new Date()).getTime(); //krijg tijd binnen
   if(t - lastClap < 10) return false;
@@ -362,15 +368,19 @@ const detectSound = data => {
   }
 
   if(highAmp > 20){
-    console.log('up');
+    //console.log('up');
+    player.positionY += 10;
+    socket.emit("yPosUp", player.positionY, player.playersocketid);
+
   }else{
-    console.log('down');
+    player.positionY -= 10;
+    socket.emit("yPosDown", player.positionY, player.playersocketid);
   }
 
   return false;
 };
 
-const sound = () => {
+const sound = player => {
   navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
   if(navigator.getUserMedia){
@@ -389,7 +399,7 @@ const sound = () => {
       recorder.onaudioprocess = b =>{
 
         let left = b.inputBuffer.getChannelData(0);
-        detectSound(left);
+        detectSound(left, player);
       };
 
       volume.connect(recorder);// connect the recorder
