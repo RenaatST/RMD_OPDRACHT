@@ -9,7 +9,6 @@ html {
   font-weight: 300;
   -webkit-font-smoothing: antialiased;
 }
-
 html, input {
   font-family:
     "HelveticaNeue-Light",
@@ -250,11 +249,45 @@ strong {
   background-color: #E63637;
 }
 
+
+.submit1{
+  -webkit-appearance: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2em;
+  font-weight: bold;
+  margin-left: 25px;
+  width: 320px;
+  height: 90px;
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  border-radius: 15px;
+  background-color: #E63637;
+}
+
+
+.submit2{
+  -webkit-appearance: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2em;
+  font-weight: bold;
+  margin-left: 25px;
+  width: 320px;
+  height: 90px;
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  border-radius: 15px;
+  background-color: #E63637;
+}
+
 .button {
   @include center;
 }
 
-.knop{
+.knop, .knopUp{
   -webkit-appearance: none;
   background: none;
   border: none;
@@ -271,7 +304,23 @@ strong {
   background-color: #E63637;
 }
 
-.knop1 {
+.knopDown{
+  -webkit-appearance: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-left: 25px;
+  margin-top: 290px;
+  width: 320px;
+  height: 90px;
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  border-radius: 15px;
+  background-color: #E63637;
+}
+.knopDown, .knopUp {
   @include center;
 }
 

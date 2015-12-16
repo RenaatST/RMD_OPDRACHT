@@ -16,8 +16,6 @@ export default class Mobile extends EventEmitter {
     $('.button :submit').click(function(e) {
       e.preventDefault();
       socket.emit('startgame', speler);
-
-
       $('.start-mobile').hide();
     });
 

@@ -273,26 +273,6 @@ const _desktop = htmlCode => {
     deleteplayer(socketid);
   });
 
-/*
-  socket.on('yfromplayergoesup', (posY, socketid) => {
-    if (spelers !== []) {
-      spelers.forEach(function(speler) {
-          if (speler.getSocketId() === socketid){
-            console.log(posY);
-            console.log(socketid);
-
-            speler.circle.position.y = posY;
-          }
-      });
-    }
-
-  });
-
-  socket.on('playerdownPosChange', data => {
-    console.log("doooooooown" + data);
-  });
-*/
-
 
 };
 
@@ -318,7 +298,6 @@ const startBackgroundFromGame = () => {
     depth: 1000,
     border: 40
   };
-
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(
     45, window.innerWidth / window.innerHeight,

@@ -32,7 +32,6 @@ export default class Player extends EventEmitter {
 
     requestAnimationFrame(() => this._onFrame());
   }
-
   render(){
 
     let x = this.positionX;

@@ -20,8 +20,6 @@ io.on('connection', socket => {
 
   socket.emit("socketid",socket.id);
 
-
-
   socket.on('startgame', data => {
 
     let client  = new Client(data.socketid, data.color);
