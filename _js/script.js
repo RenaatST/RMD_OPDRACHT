@@ -11,7 +11,6 @@ import Mobile from './modules/mobile/Mobile';
 let initialized = false;
 let socketid, clients;
 let socket = io();
-let ownplayer;
 
 let socketidMobile;
 let socketidDesktop;
@@ -101,22 +100,6 @@ const gates = () => {
 let ok = false;
 
 const render = () => {
-  //player
-
-
-  // moveY -= 5;
-  // moveX += 15;
-
-
-  // if(ok){
-  //   for(let i = 0; i < spelers.length; i++){
-  //     // scene.add(adder[i]);
-  //     spelers[i].position.x = -3000 + moveX;
-  //     spelers[i].position.y = moveY;
-  //   }
-  // }
-
-  //camera.position.x = moveX;
 
   CameraYonder = 2;
   CameraYboven = 2;
@@ -163,10 +146,6 @@ const render = () => {
         scene.add(bluecubehit[i]);
       }
     }
-
-    // if(switchgate){
-    //   scene.add(blueGate._switch());
-    // }
 
   }
 
@@ -328,9 +307,9 @@ const _mobile = htmlCode => {
 
 const makeNewClient = client => {
 
-  ownplayer = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
-  scene.add(ownplayer.render());
-  sound(ownplayer);
+  let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
+  scene.add(player.render());
+  sound(player);
 };
 
 const detectSound = (data, player) => {
