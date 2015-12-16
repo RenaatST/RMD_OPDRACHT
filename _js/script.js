@@ -12,6 +12,9 @@ let initialized = false;
 let socketid, clients;
 let socket = io();
 
+let socketidMobile;
+let socketidDesktop;
+
 ////////////////GAME/////////////////////
 
 
@@ -217,13 +220,19 @@ const init = () => {
 
 
   socket.on("socketid", data => {
-
     if(initialized === false){
       socketid = data;
+
       if(Modernizr.touch) {
         $.get('/components/mobile.html', _mobile.bind(this));
+        socketidMobile = socketid;
+        console.log(socketidMobile);
+        //newMobile(socketid);
       } else {
-         $.get('/components/desktop.html', _desktop.bind(this));
+        $.get('/components/desktop.html', _desktop.bind(this));
+        //newDesktop(socketid);
+        socketidDesktop = socketid;
+        console.log(socketidDesktop);
       }
     }
     initialized = true;
@@ -232,7 +241,6 @@ const init = () => {
 
   socket.on('thisIsANewSpeler', client => {
     makeNewClient(client);
-    console.log('hallo');
   });
 
 
@@ -249,6 +257,24 @@ const init = () => {
 
 };
 
+// const newMobile = socketid => {
+//   console.log(socketid);
+//   socket.emit('ditIsMobileSocket', socketid);
+
+//   $('.login :submit').click(function(e) {
+//     e.preventDefault();
+
+//     let key = $('.login').find('input[type=text]').val().trim();
+//     console.log(key);
+//     socket.emit('ditIsMobileSocket', (key,socketid));
+//   });
+
+// };
+
+// const newDesktop = socketid => {
+//   console.log(socketid);
+//   socket.emit('ditIsDesktopSocket', socketid);
+// };
 
 
 const deleteplayer = socketid => {
@@ -268,31 +294,127 @@ const deleteplayer = socketid => {
 
 
 const _desktop = htmlCode => {
+
+
   $('body').append($(htmlCode));
-  startBackgroundFromGame();
+  //startBackgroundFromGame();
 
   socket.on('removePlayer', socketid => {
     deleteplayer(socketid);
   });
 
+  $('.login2 :submit').click(function(e) {
+    e.preventDefault();
+
+    let key = $('.login2').find('input[type=text]').val().trim();
+    console.log(key);
+    socket.emit('ditIsDesktopSocket', key, socketidDesktop);
+    console.log(socketidDesktop);
+  });
+
+
 
 };
 
 const _mobile = htmlCode => {
+
+
   $('body').append($(htmlCode));
   let mobile = new Mobile(socket, socketid);
+
+  $('.login :submit').click(function(e) {
+    e.preventDefault();
+
+    let key = $('.login').find('input[type=text]').val().trim();
+    console.log(key);
+
+    socket.emit('ditIsMobileSocket', key, socketidMobile);
+    console.log(socketidMobile);
+  });
 
 };
 
 
 const makeNewClient = client => {
-  let player = new Player(socket, client.socketid, client.color);
+  startBackgroundFromGame();
+
+  let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
   spelers.push(player);
+
+  console.log(spelers);
+
   scene.add(player.render());
+
+  sound();
+
+
+};
+
+const detectSound = data => {
+
+  let t = (new Date()).getTime(); //krijg tijd binnen
+  if(t - lastClap < 10) return false;
+
+  let zeroCrossings = 0, highAmp = 0;
+  for(let i = 1; i < data.length; i++){
+    if(Math.abs(data[i]) > 0.25) highAmp++;
+    if(data[i] > 0 && data[i-1] < 0 || data[i] < 0 && data[i-1] > 0) zeroCrossings++;
+  }
+
+  if(highAmp > 20){
+    console.log('up');
+  }else{
+    console.log('down');
+  }
+
+  return false;
+};
+
+const sound = () => {
+  navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+  if(navigator.getUserMedia){
+
+    navigator.getUserMedia({
+      audio: true
+    },
+
+    e => {
+
+      volume = audioContext.createGain(); // creates a gain node
+      audioInput = audioContext.createMediaStreamSource(e); // creates an audio node from the mic stream
+      audioInput.connect(volume);// connect the stream to the gain node
+      recorder = audioContext.createScriptProcessor(2048, 1, 1);
+
+      recorder.onaudioprocess = b =>{
+
+        let left = b.inputBuffer.getChannelData(0);
+        detectSound(left);
+      };
+
+      volume.connect(recorder);// connect the recorder
+      recorder.connect(audioContext.destination);
+    },
+    () => { //failure
+      let customAlert;
+      customAlert('Error capturing audio.');
+    });
+
+  } else {
+    let customAlert;
+    customAlert('getUserMedia not supported in this browser.');
+  }
 };
 
 
 const startBackgroundFromGame = () => {
+
+
+  let AudioContext = window.AudioContext || window.webkitAudioContext;
+    audioContext = new AudioContext();
+
+  let lastClap = (new Date()).getTime();
+
 
   bounds = {
     width: window.innerWidth,

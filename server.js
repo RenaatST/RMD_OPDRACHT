@@ -7,27 +7,51 @@ let io = require('socket.io')(server);
 var Client = require('./models/Client');
 
 let port = process.env.PORT || 3000;
+let loginWord = "kaka";
+let loginWord2 = "pipi";
 
 let clients = [];
 let socketid;
 
+let firstSocketId;
+let secondSocketId;
+
 app.use(express.static(__dirname + '/public'));
-
-
 
 io.on('connection', socket => {
   socketid = socket.id;
-  console.log('hallo');
+
   socket.emit("socketid",socket.id);
 
-  socket.on('startgame', data => {
 
-    let client  = new Client(data.socketid, data.color);
-    socket.broadcast.emit('thisIsANewSpeler', client);
-    clients.push(client);
+  socket.on('ditIsMobileSocket', (key, socketidMobile) => {
+    console.log(socketidMobile);
+    console.log(key);
+    loginWord2 = key;
+    firstSocketId = socketidMobile;
 
+    if(loginWord === loginWord2){
+      console.log("dit is mobile met id " + firstSocketId + " and connected to desktop id " + secondSocketId);
+      let client  = new Client(firstSocketId, secondSocketId, 'red');
+      //socket.emit('thisIsANewSpeler', client);
+      io.to(secondSocketId).emit('thisIsANewSpeler', client);
+      clients.push(client);
+    };
 
+    //console.log(firstSocketId);
   });
+
+  socket.on('ditIsDesktopSocket', (key, socketidDesktop) => {
+    console.log(socketidDesktop);
+    console.log(key);
+    loginWord = key;
+    secondSocketId = socketidDesktop;
+    //console.log(firstSocketId);
+  });
+
+
+
+
 
   socket.on('movePlayerUp', player => {
     io.emit('thisPlayerUp', player);
@@ -40,7 +64,6 @@ io.on('connection', socket => {
     socket.broadcast.emit('removePlayer', socket.id);
 
   });
-
 
 
 });

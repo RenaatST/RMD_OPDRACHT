@@ -2,8 +2,9 @@
 
 class Client{
 
-  constructor(socketid, color){
-    this.socketid = socketid;
+  constructor(socketidMobile, socketidDesktop, color){
+    this.socketidMobile = socketidMobile;
+    this.socketidDesktop = socketidDesktop;
     this.color = color;
   }
 }

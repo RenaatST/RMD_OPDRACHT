@@ -5,15 +5,18 @@ import EventEmitter from 'eventemitter2';
 
 export default class Player extends EventEmitter {
 
-  constructor(socket, playersocketid, color){
+  constructor(socket, playersocketid, desktopsocketid, color){
     super();
     this.socket = socket;
 
     this.playersocketid = playersocketid;
+    this.desktopsocketid = desktopsocketid;
     this.positionX = 100;
     this.positionY = 100;
     this.color = color;
 
+    console.log(this.playersocketid);
+    console.log(this.desktopsocketid);
     this.render();
   }
 
@@ -32,8 +35,8 @@ export default class Player extends EventEmitter {
 
     requestAnimationFrame(() => this._onFrame());
   }
+
   render(){
-    console.log('hallo');
     let x = this.positionX;
     let y = this.positionY;
     let color = this.color;
