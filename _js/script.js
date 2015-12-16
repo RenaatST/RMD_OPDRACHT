@@ -346,11 +346,11 @@ const detectSound = (data, player) => {
 
   if(highAmp > 20){
     //console.log('up');
-    player.positionY += 10;
+    player.positionY += 19;
     socket.emit("yPosUp", player.positionY, player.playersocketid);
 
   }else{
-    player.positionY -= 10;
+    player.positionY -= 3;
     socket.emit("yPosDown", player.positionY, player.playersocketid);
   }
 
