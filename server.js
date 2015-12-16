@@ -2,7 +2,7 @@
 
 let express = require('express');
 let app = express();
-let server = require('http').Server(app);
+let server = require('https').Server(app);
 let io = require('socket.io')(server);
 var Client = require('./models/Client');
 
@@ -35,6 +35,7 @@ io.on('connection', socket => {
       let client  = new Client(firstSocketId, secondSocketId, 'red');
       //socket.emit('thisIsANewSpeler', client);
       io.to(secondSocketId).emit('thisIsANewSpeler', client);
+      socket.broadcast.emit('newplayer', client);
       clients.push(client);
     };
 

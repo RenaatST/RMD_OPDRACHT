@@ -239,6 +239,13 @@ const init = () => {
   });
 
 
+  socket.on('newplayer', client => {
+    let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
+    scene.add(player.render());
+    console.log('naar iedereen: deze speler is toegevoegd ' + player);
+    console.log("tis kut");
+  });
+
   socket.on('thisIsANewSpeler', client => {
     makeNewClient(client);
   });
