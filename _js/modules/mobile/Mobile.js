@@ -12,7 +12,7 @@ export default class Mobile extends EventEmitter {
     this.socket = socket;
     this.socketid = socketid;
     let speler = new Speler(this.socketid, MathUtil.randomColor());
-
+console.log('hallo');
     $('.button :submit').click(function(e) {
       e.preventDefault();
       socket.emit('startgame', speler);

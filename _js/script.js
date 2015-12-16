@@ -231,6 +231,7 @@ const init = () => {
 
   socket.on('thisIsANewSpeler', client => {
     makeNewClient(client);
+    console.log('hallo');
   });
 
 
@@ -238,7 +239,7 @@ const init = () => {
     if (spelers !== []) {
       spelers.forEach(function(speler) {
         if (speler.getSocketId() === thisplayer.socketid){
-          console.log(speler.positionY);
+
           speler.positionY = 300;
         }
       });

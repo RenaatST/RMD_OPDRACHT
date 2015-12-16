@@ -33,7 +33,7 @@ export default class Player extends EventEmitter {
     requestAnimationFrame(() => this._onFrame());
   }
   render(){
-
+    console.log('hallo');
     let x = this.positionX;
     let y = this.positionY;
     let color = this.color;

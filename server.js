@@ -17,7 +17,7 @@ app.use(express.static(__dirname + '/public'));
 
 io.on('connection', socket => {
   socketid = socket.id;
-
+  console.log('hallo');
   socket.emit("socketid",socket.id);
 
   socket.on('startgame', data => {
