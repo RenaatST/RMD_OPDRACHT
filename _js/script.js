@@ -217,8 +217,9 @@ const init = () => {
   socket.on('thisIsANewSpeler', client => {
     console.log("aangemaakt");
     let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
-    sound(player);
     scene.add(player.render());
+    sound(player);
+
   });
 
   socket.on('yPosupdateDown', (thisY, playerId ) => {
@@ -282,9 +283,9 @@ const _desktop = htmlCode => {
   socket.on('newplayer', client => {
     if(socketidDesktop !== client.socketidDesktop){
       let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
+      console.log('naar iedereen behalve zichzelf: deze speler is toegevoegd' + player.playersocketid);
       spelers.push(player);
       scene.add(player.render());
-      console.log('naar iedereen: deze speler is toegevoegd' + player.playersocketid);
     }
   });
 
@@ -293,9 +294,7 @@ const _desktop = htmlCode => {
 
 const _mobile = htmlCode => {
 
-
   $('body').append($(htmlCode));
-  //let mobile = new Mobile(socket, socketid);
 
   $('.login :submit').click(function(e) {
     e.preventDefault();
@@ -322,11 +321,13 @@ const detectSound = (data, player) => {
   if(highAmp > 20){
     //console.log('up');
     player.positionY += 19;
+
+    console.log("sound got from mobileid = " + player.playersocketid);
     socket.emit("yPosUp", player.positionY, player.playersocketid);
 
   }else{
-    player.positionY -= 3;
-    socket.emit("yPosDown", player.positionY, player.playersocketid);
+    //player.positionY -= 3;
+    //socket.emit("yPosDown", player.positionY, player.playersocketid);
   }
 
   return false;

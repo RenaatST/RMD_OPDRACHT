@@ -14,8 +14,8 @@ let clients = [];
 let socketid;
 let arrayMetKeys = [];
 
-let firstSocketId;
-let secondSocketId;
+let mobileSocketIdInServer;
+let desktopSocketIdInServer;
 
 app.use(express.static(__dirname + '/public'));
 
@@ -36,31 +36,31 @@ io.on('connection', socket => {
 
   socket.on('ditIsDesktopSocket', (key, socketidDesktop) => {
     loginWord = key;
-    secondSocketId = socketidDesktop;
+    desktopSocketIdInServer = socketidDesktop;
 
     //arrayMetKeys.push(key);
-    arrayMetKeys.push({id: secondSocketId, key: loginWord});
+    arrayMetKeys.push({id: desktopSocketIdInServer, key: loginWord});
   });
 
   socket.on('ditIsMobileSocket', (key, socketidMobile) => {
-    firstSocketId = socketidMobile;
+    mobileSocketIdInServer = socketidMobile;
 
     if (arrayMetKeys !== []) {
       arrayMetKeys.forEach(function(code) {
         if (code.key === key){
-          console.log("dit is mobile met id " + firstSocketId + " and connected to desktop id " + secondSocketId);
 
-          let client  = new Client(firstSocketId, secondSocketId, randomColor());
+          console.log("dit is mobile met id " + mobileSocketIdInServer + " and connected to desktop id " + code.id);
 
-          socket.emit('thisIsANewSpeler', client);
+          let client  = new Client(mobileSocketIdInServer, code.id, randomColor());
 
-          console.log("all keys before " + arrayMetKeys);
+          socket.broadcast.to(code.id).emit('thisIsANewSpeler', client);
+          console.log("client to yourself " + client.socketidMobile);
+
           arrayMetKeys.splice(arrayMetKeys.indexOf(code), 1);
-          console.log("all keys " + arrayMetKeys);
 
-
-          socket.broadcast.emit('newplayer', client);
-
+          console.log("client to everyone " + client.socketidMobile);
+          console.log("desktop to everyone " + client.socketidDesktop);
+          io.sockets.emit('newplayer', client);
 
         }else{
           console.log(key + " je zit verkeerd");
