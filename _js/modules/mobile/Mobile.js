@@ -11,23 +11,21 @@ export default class Mobile extends EventEmitter {
     super();
     this.socket = socket;
     this.socketid = socketid;
-    console.log('dit is mobile ' + socketid);
-
     let speler = new Speler(this.socketid, MathUtil.randomColor());
-
-    console.log(speler);
 
     $('.button :submit').click(function(e) {
       e.preventDefault();
       socket.emit('startgame', speler);
+
+
       $('.start-mobile').hide();
     });
+
+    $('.knopUp :submit').click(function(e) {
+      e.preventDefault();
+      socket.emit('movePlayerUp', speler);
+    });
+
   }
-
-
-
-
-
-
 
 }

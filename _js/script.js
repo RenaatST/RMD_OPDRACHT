@@ -215,11 +215,6 @@ const render = () => {
 const init = () => {
 
 
-
-  socket.on("ditisiets", data => {
-    console.log('dit is iets');
-  });
-
   socket.on("socketid", data => {
 
     if(initialized === false){
@@ -233,28 +228,37 @@ const init = () => {
     initialized = true;
   });
 
-  socket.on('thisIsANewSpeler', client => {
 
+  socket.on('thisIsANewSpeler', client => {
     makeNewClient(client);
   });
 
 
-
+  socket.on('thisPlayerUp', thisplayer => {
+    if (spelers !== []) {
+      spelers.forEach(function(speler) {
+        if (speler.getSocketId() === thisplayer.socketid){
+          console.log(speler.positionY);
+          speler.positionY = 300;
+        }
+      });
+    }
+  });
 
 };
 
+
+
 const deleteplayer = socketid => {
-  console.log("this is client we need to delete " + socketid);
+  //console.log("this is client we need to delete " + socketid);
   if (spelers !== []) {
     spelers.forEach(function(speler) {
         if (speler.getSocketId() === socketid){
           console.log("removed: " + socketid);
           console.log(speler);
-
           scene.remove(speler.circle);
         }
     });
-    console.log(spelers.length);
   }
 };
 
@@ -269,7 +273,7 @@ const _desktop = htmlCode => {
     deleteplayer(socketid);
   });
 
-
+/*
   socket.on('yfromplayergoesup', (posY, socketid) => {
     if (spelers !== []) {
       spelers.forEach(function(speler) {
@@ -278,20 +282,16 @@ const _desktop = htmlCode => {
             console.log(socketid);
 
             speler.circle.position.y = posY;
-
-
           }
       });
     }
 
-    //console.log('player ' + socketidplayerchanged + ' changed y ' + ypos);
   });
 
   socket.on('playerdownPosChange', data => {
     console.log("doooooooown" + data);
-    //console.log('player ' + socketidplayerchanged + ' changed y ' + ypos);
   });
-
+*/
 
 
 };
@@ -299,6 +299,7 @@ const _desktop = htmlCode => {
 const _mobile = htmlCode => {
   $('body').append($(htmlCode));
   let mobile = new Mobile(socket, socketid);
+
 };
 
 
