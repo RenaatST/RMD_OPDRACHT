@@ -52,14 +52,14 @@ io.on('connection', socket => {
 
           let client  = new Client(firstSocketId, secondSocketId, randomColor());
 
-          io.to(secondSocketId).emit('thisIsANewSpeler', client);
+          socket.emit('thisIsANewSpeler', client);
 
           console.log("all keys before " + arrayMetKeys);
           arrayMetKeys.splice(arrayMetKeys.indexOf(code), 1);
           console.log("all keys " + arrayMetKeys);
 
 
-          //socket.broadcast.emit('newplayer', client);
+          socket.broadcast.emit('newplayer', client);
 
 
         }else{

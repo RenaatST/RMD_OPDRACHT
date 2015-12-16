@@ -215,7 +215,7 @@ const init = () => {
 
 
   socket.on('thisIsANewSpeler', client => {
-
+    console.log("aangemaakt");
     let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
     sound(player);
     scene.add(player.render());
