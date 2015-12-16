@@ -58,6 +58,8 @@ io.on('connection', socket => {
           arrayMetKeys.splice(arrayMetKeys.indexOf(code), 1);
           console.log("all keys " + arrayMetKeys);
           socket.broadcast.emit('newplayer', client);
+
+
         }else{
           console.log(key + " je zit verkeerd");
         }

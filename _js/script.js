@@ -215,7 +215,10 @@ const init = () => {
 
 
   socket.on('thisIsANewSpeler', client => {
-    makeNewClient(client);
+
+    let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
+    sound(player);
+    scene.add(player.render());
   });
 
   socket.on('yPosupdateDown', (thisY, playerId ) => {
@@ -305,15 +308,8 @@ const _mobile = htmlCode => {
 };
 
 
-const makeNewClient = client => {
-  let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
-  scene.add(player.render());
-  sound(player);
-  socket.emit('nowBroadcastPlayerToAllPlayers', player);
-};
 
 const detectSound = (data, player) => {
-  console.log("alleen jezelf nu");
   let t = (new Date()).getTime(); //krijg tijd binnen
   if(t - lastClap < 10) return false;
 
