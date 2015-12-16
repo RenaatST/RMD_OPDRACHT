@@ -219,7 +219,7 @@ const init = () => {
   });
 
   socket.on('yPosupdateDown', (thisY, playerId ) => {
-    console.log(thisY + " playerid " + playerId);
+    //console.log(thisY + " playerid " + playerId);
 
     if (spelers !== []) {
       spelers.forEach(function(speler) {
@@ -231,7 +231,7 @@ const init = () => {
   });
 
   socket.on('yPosupdate', (thisY, playerId ) => {
-    console.log(thisY + " playerid " + playerId);
+    //console.log(thisY + " playerid " + playerId);
 
     if (spelers !== []) {
       spelers.forEach(function(speler) {
@@ -306,14 +306,13 @@ const _mobile = htmlCode => {
 
 
 const makeNewClient = client => {
-
   let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
   scene.add(player.render());
   sound(player);
 };
 
 const detectSound = (data, player) => {
-
+  console.log("alleen jezelf nu");
   let t = (new Date()).getTime(); //krijg tijd binnen
   if(t - lastClap < 10) return false;
 
