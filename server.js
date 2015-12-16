@@ -24,6 +24,10 @@ io.on('connection', socket => {
   socket.emit("socketid",socket.id);
 
 
+  socket.on('newplayer', client => {
+    socket.broadcast.emit('newplayerToEveryone', client);
+  });
+
   socket.on('ditIsMobileSocket', (key, socketidMobile) => {
 
     loginWord2 = key;
@@ -34,7 +38,7 @@ io.on('connection', socket => {
       let client  = new Client(firstSocketId, secondSocketId, 'red');
       //socket.emit('thisIsANewSpeler', client);
       io.to(secondSocketId).emit('thisIsANewSpeler', client);
-      socket.broadcast.emit('newplayer', client);
+
       //clients.push(client);
     };
 

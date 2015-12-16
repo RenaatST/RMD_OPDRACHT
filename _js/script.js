@@ -235,11 +235,9 @@ const init = () => {
   });
 
 
-  socket.on('newplayer', client => {
-    let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
-    scene.add(player.render());
 
-    console.log('naar iedereen: deze speler is toegevoegd ' + player.playersocketid);
+  socket.on('newplayerToEveryone', client => {
+    scene.add(client.render());
   });
 
   socket.on('thisIsANewSpeler', client => {
@@ -348,7 +346,7 @@ const makeNewClient = client => {
   let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
   spelers.push(player);
   scene.add(player.render());
-
+  socket.emit('newplayer', player);
   sound();
 };
 
