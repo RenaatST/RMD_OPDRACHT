@@ -15,6 +15,17 @@ export const randomPoint = bounds => {
 
 };
 
+export const makeCode = () => {
+    var text = "";
+    var possible = "abcdefghijklmnopqrstuvwxyz";
+
+    for( var i=0; i < 3; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+};
+
+
 export const randomColor = () => {
 
   let letters = '0123456789ABCDEF'.split('');
@@ -53,6 +64,7 @@ export const randomBetween = (min, max, round=true, signed=false) => {
 };
 
 export default {
+  makeCode,
   randomBetween,
   distanceBetweenPoints,
   randomPoint,

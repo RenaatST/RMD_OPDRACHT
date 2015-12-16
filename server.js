@@ -25,8 +25,7 @@ io.on('connection', socket => {
 
 
   socket.on('ditIsMobileSocket', (key, socketidMobile) => {
-    console.log(socketidMobile);
-    console.log(key);
+
     loginWord2 = key;
     firstSocketId = socketidMobile;
 
@@ -36,15 +35,14 @@ io.on('connection', socket => {
       //socket.emit('thisIsANewSpeler', client);
       io.to(secondSocketId).emit('thisIsANewSpeler', client);
       socket.broadcast.emit('newplayer', client);
-      clients.push(client);
+      //clients.push(client);
     };
 
     //console.log(firstSocketId);
   });
 
   socket.on('ditIsDesktopSocket', (key, socketidDesktop) => {
-    console.log(socketidDesktop);
-    console.log(key);
+
     loginWord = key;
     secondSocketId = socketidDesktop;
     //console.log(firstSocketId);

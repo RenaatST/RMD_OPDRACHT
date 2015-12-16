@@ -62,6 +62,7 @@ let spelers;
 spelers = [];
 
 
+
 const gates = () => {
 
   for(let i = 0; i < 10; i++){
@@ -216,7 +217,6 @@ const render = () => {
 
 
 const init = () => {
-  console.log("inti");
 
 
   socket.on("socketid", data => {
@@ -226,13 +226,9 @@ const init = () => {
       if(Modernizr.touch) {
         $.get('/components/mobile.html', _mobile.bind(this));
         socketidMobile = socketid;
-        console.log(socketidMobile);
-        //newMobile(socketid);
       } else {
         $.get('/components/desktop.html', _desktop.bind(this));
-        //newDesktop(socketid);
         socketidDesktop = socketid;
-        console.log(socketidDesktop);
       }
     }
     initialized = true;
@@ -242,8 +238,8 @@ const init = () => {
   socket.on('newplayer', client => {
     let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
     scene.add(player.render());
-    console.log('naar iedereen: deze speler is toegevoegd ' + player);
-    console.log("tis kut");
+
+    console.log('naar iedereen: deze speler is toegevoegd ' + player.playersocketid);
   });
 
   socket.on('thisIsANewSpeler', client => {
@@ -289,8 +285,7 @@ const deleteplayer = socketid => {
   if (spelers !== []) {
     spelers.forEach(function(speler) {
         if (speler.getSocketId() === socketid){
-          console.log("removed: " + socketid);
-          console.log(speler);
+
           scene.remove(speler.circle);
         }
     });
@@ -301,7 +296,7 @@ const deleteplayer = socketid => {
 
 
 const _desktop = htmlCode => {
-
+  startBackgroundFromGame();
 
   $('body').append($(htmlCode));
   //startBackgroundFromGame();
@@ -310,14 +305,23 @@ const _desktop = htmlCode => {
     deleteplayer(socketid);
   });
 
-  $('.login2 :submit').click(function(e) {
-    e.preventDefault();
+  let code = MathUtil.makeCode();
 
-    let key = $('.login2').find('input[type=text]').val().trim();
-    console.log(key);
-    socket.emit('ditIsDesktopSocket', key, socketidDesktop);
-    console.log(socketidDesktop);
-  });
+  $('body').prepend(code);
+  console.log(code);
+
+  socket.emit('ditIsDesktopSocket', code, socketidDesktop);
+
+
+
+
+
+  // $('.login2 :submit').click(function(e) {
+  //   e.preventDefault();
+
+  //   let key = $('.login2').find('input[type=text]').val().trim();
+
+  // });
 
 
 
@@ -327,34 +331,25 @@ const _mobile = htmlCode => {
 
 
   $('body').append($(htmlCode));
-  let mobile = new Mobile(socket, socketid);
+  //let mobile = new Mobile(socket, socketid);
 
   $('.login :submit').click(function(e) {
     e.preventDefault();
 
     let key = $('.login').find('input[type=text]').val().trim();
-    console.log(key);
-
     socket.emit('ditIsMobileSocket', key, socketidMobile);
-    console.log(socketidMobile);
   });
 
 };
 
 
 const makeNewClient = client => {
-  startBackgroundFromGame();
 
   let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
   spelers.push(player);
-
-  console.log(spelers);
-
   scene.add(player.render());
 
   sound();
-
-
 };
 
 const detectSound = data => {
