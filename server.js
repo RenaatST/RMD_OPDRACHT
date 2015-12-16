@@ -4,11 +4,11 @@ let express = require('express');
 let app = express();
 let server = require('http').Server(app);
 let io = require('socket.io')(server);
-var Client = require('./models/Client');
+let Client = require('./models/Client');
 
 let port = process.env.PORT || 3000;
-let loginWord = "kaka";
-let loginWord2 = "pipi";
+let loginWord = "woord1";
+let loginWord2 = "woord2";
 
 let clients = [];
 let socketid;
@@ -23,9 +23,6 @@ io.on('connection', socket => {
   socketid = socket.id;
 
   socket.emit("socketid",socket.id);
-
-
-
 
   socket.on('yPosDown', (playerposY, playerId) => {
     socket.broadcast.emit('yPosupdateDown', playerposY, playerId);
@@ -51,7 +48,7 @@ io.on('connection', socket => {
         if (code.key === key){
           console.log("dit is mobile met id " + firstSocketId + " and connected to desktop id " + secondSocketId);
 
-          let client  = new Client(firstSocketId, secondSocketId, 'red');
+          let client  = new Client(firstSocketId, secondSocketId, randomColor());
           socket.broadcast.emit('newplayer', client);
           io.to(secondSocketId).emit('thisIsANewSpeler', client);
 
@@ -98,6 +95,18 @@ io.on('connection', socket => {
 
 
 });
+
+
+const randomColor = () => {
+
+  let letters = '0123456789ABCDEF'.split('');
+  let color = '#';
+  for (let i = 0; i < 6; i++ ) {
+      color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+
+};
 
 server.listen(port, () => {
   console.log('Server listening at port %d', port);
