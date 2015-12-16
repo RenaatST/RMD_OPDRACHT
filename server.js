@@ -57,7 +57,7 @@ io.on('connection', socket => {
           console.log("all keys before " + arrayMetKeys);
           arrayMetKeys.splice(arrayMetKeys.indexOf(code), 1);
           console.log("all keys " + arrayMetKeys);
-
+          socket.broadcast.emit('newplayer', client);
         }else{
           console.log(key + " je zit verkeerd");
         }
@@ -67,9 +67,6 @@ io.on('connection', socket => {
   });
 
 
-  socket.on('nowBroadcastPlayerToAllPlayers', client => {
-    socket.broadcast.emit('newplayer', client);
-  });
 
 
   socket.on('disconnect', () => {
