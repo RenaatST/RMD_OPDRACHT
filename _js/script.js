@@ -213,6 +213,7 @@ const render = () => {
 
 
 const init = () => {
+  console.log("inti");
 
 
   socket.on("socketid", data => {
