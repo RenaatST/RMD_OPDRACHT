@@ -223,7 +223,6 @@ const init = () => {
   socket.on("socketid", data => {
     if(initialized === false){
       socketid = data;
-
       if(Modernizr.touch) {
         $.get('/components/mobile.html', _mobile.bind(this));
         socketidMobile = socketid;
@@ -236,12 +235,9 @@ const init = () => {
   });
 
 
-
-
   socket.on('thisIsANewSpeler', client => {
     makeNewClient(client);
   });
-
 
   socket.on('yPosupdateDown', (thisY, playerId ) => {
     console.log(thisY + " playerid " + playerId);
@@ -269,24 +265,6 @@ const init = () => {
 
 };
 
-// const newMobile = socketid => {
-//   console.log(socketid);
-//   socket.emit('ditIsMobileSocket', socketid);
-
-//   $('.login :submit').click(function(e) {
-//     e.preventDefault();
-
-//     let key = $('.login').find('input[type=text]').val().trim();
-//     console.log(key);
-//     socket.emit('ditIsMobileSocket', (key,socketid));
-//   });
-
-// };
-
-// const newDesktop = socketid => {
-//   console.log(socketid);
-//   socket.emit('ditIsDesktopSocket', socketid);
-// };
 
 
 const deleteplayer = socketid => {
@@ -300,8 +278,6 @@ const deleteplayer = socketid => {
     });
   }
 };
-
-
 
 
 const _desktop = htmlCode => {
@@ -326,7 +302,7 @@ const _desktop = htmlCode => {
       let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
       spelers.push(player);
       scene.add(player.render());
-      console.log('naar iedereen: deze speler is toegevoegd ' + player.playersocketid);
+      console.log('naar iedereen: deze speler is toegevoegd' + player.playersocketid);
     }
   });
 
@@ -344,6 +320,7 @@ const _mobile = htmlCode => {
 
     let key = $('.login').find('input[type=text]').val().trim();
     socket.emit('ditIsMobileSocket', key, socketidMobile);
+
   });
 
 };

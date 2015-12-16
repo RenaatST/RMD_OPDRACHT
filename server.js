@@ -12,6 +12,7 @@ let loginWord2 = "pipi";
 
 let clients = [];
 let socketid;
+let arrayMetKeys = [];
 
 let firstSocketId;
 let secondSocketId;
@@ -24,23 +25,7 @@ io.on('connection', socket => {
   socket.emit("socketid",socket.id);
 
 
-  socket.on('ditIsMobileSocket', (key, socketidMobile) => {
 
-    loginWord2 = key;
-    firstSocketId = socketidMobile;
-
-    if(loginWord === loginWord2){
-      console.log("dit is mobile met id " + firstSocketId + " and connected to desktop id " + secondSocketId);
-      let client  = new Client(firstSocketId, secondSocketId, 'red');
-      //socket.emit('thisIsANewSpeler', client);
-      socket.broadcast.emit('newplayer', client);
-      io.to(secondSocketId).emit('thisIsANewSpeler', client);
-
-      //clients.push(client);
-    };
-
-    //console.log(firstSocketId);
-  });
 
   socket.on('yPosDown', (playerposY, playerId) => {
     socket.broadcast.emit('yPosupdateDown', playerposY, playerId);
@@ -51,10 +36,48 @@ io.on('connection', socket => {
   });
 
   socket.on('ditIsDesktopSocket', (key, socketidDesktop) => {
-
     loginWord = key;
     secondSocketId = socketidDesktop;
-    //console.log(firstSocketId);
+
+    //arrayMetKeys.push(key);
+    arrayMetKeys.push({id: secondSocketId, key: loginWord});
+  });
+
+  socket.on('ditIsMobileSocket', (key, socketidMobile) => {
+    firstSocketId = socketidMobile;
+
+    if (arrayMetKeys !== []) {
+      arrayMetKeys.forEach(function(code) {
+        if (code.key === key){
+          console.log("dit is mobile met id " + firstSocketId + " and connected to desktop id " + secondSocketId);
+
+          let client  = new Client(firstSocketId, secondSocketId, 'red');
+          socket.broadcast.emit('newplayer', client);
+          io.to(secondSocketId).emit('thisIsANewSpeler', client);
+
+          console.log("all keys before " + arrayMetKeys);
+          arrayMetKeys.splice(arrayMetKeys.indexOf(code), 1);
+          console.log("all keys " + arrayMetKeys);
+
+        }else{
+          console.log(key + " je zit verkeerd");
+        }
+      });
+    }
+
+
+    // loginWord2 = key;
+    // firstSocketId = socketidMobile;
+
+    // if(loginWord === loginWord2){
+    //   console.log("dit is mobile met id " + firstSocketId + " and connected to desktop id " + secondSocketId);
+    //   let client  = new Client(firstSocketId, secondSocketId, 'red');
+    //   //socket.emit('thisIsANewSpeler', client);
+    //   socket.broadcast.emit('newplayer', client);
+    //   io.to(secondSocketId).emit('thisIsANewSpeler', client);
+
+    // };
+
   });
 
 
