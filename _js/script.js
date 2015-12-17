@@ -64,8 +64,8 @@ const gates = player => {
   for(let i = 0; i < 10; i++){
     let random = (3000 * i);
     let posX = random + MathUtil.randomBetween(1000, 2000);
-    let posY2 = 0-window.innerHeight/2;
-    let posY1 = window.innerHeight-window.innerHeight/2;
+    let posY2 = -window.innerHeight;
+    let posY1 = window.innerHeight;
 
     blueGate = new BlueGate(MathUtil.randomPoint(bounds));
     redGate = new RedGate(MathUtil.randomPoint(bounds));
@@ -74,8 +74,8 @@ const gates = player => {
     blueGateArrX.push(posX);
 
     redGateArrY.push(posY2);
-    blueGateArrY.push(posY1);
     redGateArrY.push(posY1);
+    blueGateArrY.push(posY1);
     blueGateArrY.push(posY2);
 
 
@@ -168,42 +168,50 @@ const render = player => {
     }
   }
 
+
   for(let i = 0; i < redGateArrX.length; i++){
 
-    let redY1 = redGateArrY[i] + window.innerHeight/2;
-    let redY2 = redGateArrY[i] - window.innerHeight/2;
+    let redY1 = redGateArrY[i] + window.innerHeight;
+    let redY2 = redGateArrY[i] - window.innerHeight;
     let redX = redGateArrX[i];
-
-
-    if(playerX === redGateArrX[1]){
-      console.log("nu");
-    }
+    let arrRed = [];
 
     if(hitRed){
-      if(redY1 > playerY && redY2 < playerY && redX < playerX){
-        //console.log('RED GATE - HIT');
-        scene.remove(redcube[i]);
-        scene.add(redcubehit[i]);
+      for (let i = redX - 50; i < redX + 50; i++) {
+        arrRed.push(i);
+      }
+      if(arrRed !== []){
+        arrRed.forEach(rood => {
+         if(redY1 > playerY && redY2 < playerY && rood === playerX){
+            console.log('RED GATE - HIT');
+            scene.remove(redcube[i]);
+            scene.add(redcubehit[i]);
+          }
+        });
       }
     }
 
-
-    let blueY1 = blueGateArrY[i] + window.innerHeight*3;
-    let blueY2 = blueGateArrY[i] - window.innerHeight/2;
+    let blueY1 = blueGateArrY[i] + window.innerHeight;
+    let blueY2 = blueGateArrY[i] - window.innerHeight;
     let blueX = blueGateArrX[i];
+    let arrBlue = [];
     if(hitBlue){
-      if(blueY1 > playerY && blueY2 < playerY && blueX < playerX){
-        //console.log('BLUE GATE - HIT');
-        scene.remove(bluecube[i]);
-        scene.add(bluecubehit[i]);
+      for (let i = blueX - 50; i < blueX + 50; i++) {
+        arrBlue.push(i);
+      }
+      if(arrBlue !== []){
+        arrBlue.forEach(blauw => {
+         if(blueY1 > playerY && blueY2 < playerY && blauw === playerX){
+            console.log('BLUE GATE - HIT');
+            scene.remove(bluecube[i]);
+            scene.add(bluecubehit[i]);
+          }
+        });
       }
     }
-
-    // console.log("dit is bluegate x waarde" + blueX)
-    // console.log("dit is bluegate y waarde" + blueY1);
-    // console.log("dit is player y waarde" + playerY);
 
   }
+
 
 
 

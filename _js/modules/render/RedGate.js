@@ -28,8 +28,7 @@ export default class RedGate extends EventEmitter {
     let {x, y, z} = this.position;
     let {color} = this;
 
-    var geometry = new THREE.BoxGeometry(100, window.innerHeight*3, 1);
-    geometry.translate(0, -window.innerHeight, 0 );
+    let geometry = new THREE.BoxGeometry(100, window.innerHeight*2, 1);
     let material = new THREE.MeshBasicMaterial({ color: color});
     let cube = new THREE.Mesh(geometry, material);
     this.cube = cube;
