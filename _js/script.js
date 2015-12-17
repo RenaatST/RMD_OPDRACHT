@@ -57,7 +57,9 @@ let playerY;
 
 
 
-let shakeCam = true;
+let shakeCam = false;
+
+
 
 const gates = player => {
   console.log(player);
@@ -130,23 +132,21 @@ const delay = (ms) => {
 // };
 
 
-// const shakeCamera = () => {
-//   CameraYonder = MathUtil.randomBetween(50,60);
-//   delay(2000).then(function() {
-//     CameraYonder = 0;
-//   });
-// }
+const shakeCamera = () => {
+  CameraYonder = MathUtil.randomBetween(50,60);
+  delay(2000).then(function() {
+    CameraYonder = 0;
+  });
+}
 
 
 
 const render = player => {
 
-  // if(shakeCam){
-  //   delay(5000).then(function() {
-  //     shakeCamera();
-  //   });
-  //   shakeCam = false;
-  // }
+  if(shakeCam){
+    shakeCamera();
+    shakeCam = false;
+  }
 
   playerX += 5;
   camera.position.x = playerX;
@@ -318,7 +318,7 @@ const init = () => {
 
           /////////////////////////////////DISTURB/////////////////////////////////////////
 
-
+          shakeCam = true;
 
 
 
