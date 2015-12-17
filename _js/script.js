@@ -283,6 +283,83 @@ const init = () => {
     initialized = true;
   });
 
+  socket.on('downHill', IdFromDownHill => {
+
+    if (spelers !== []) {
+      spelers.forEach(speler => {
+        if(speler.getSocketId() === IdFromDownHill){
+          console.log("Downhill " + speler.playersocketid + " met y pos " + speler.positionY);
+
+          /////////////////////////////////DOWNHILL/////////////////////////////////////////
+
+
+
+
+        }
+      });
+    }
+
+  });
+
+  socket.on('disturbToAll', sockIdDisturb => {
+
+    if (spelers !== []) {
+      spelers.forEach(speler => {
+        if(speler.getSocketId() === sockIdDisturb){
+          console.log("Disturb  " + speler.playersocketid + " met y pos " + speler.positionY);
+
+          /////////////////////////////////DISTURB/////////////////////////////////////////
+
+
+
+
+
+
+        }
+      });
+    }
+
+  });
+
+  socket.on('changecolorToAll', sockIdShuffle => {
+
+    if (spelers !== []) {
+      spelers.forEach(speler => {
+        if(speler.getSocketId() === sockIdShuffle){
+          console.log("Change color " + speler.playersocketid + " met y pos " + speler.positionY);
+
+
+          /////////////////////////////////CHANGE COLOR/////////////////////////////////////////
+
+
+
+
+
+        }
+      });
+    }
+
+  });
+
+  socket.on('shuffleToAll', sockIdColor => {
+
+    if (spelers !== []) {
+      spelers.forEach(speler => {
+        if(speler.getSocketId() === sockIdColor){
+          console.log("Shuffle all " + speler.playersocketid + " met y pos " + speler.positionY);
+
+          /////////////////////////////////SHUFFLE/////////////////////////////////////////
+
+
+
+
+
+        }
+      });
+    }
+
+  });
+
 
   socket.on('schermwegdoen', () => {
     document.getElementById("loginmobile").style.display = "none";
@@ -298,7 +375,7 @@ const init = () => {
 
     let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
     scene.add(player.render());
-
+    spelers.push(player);
     sound(player);
     gates(player);
   });
@@ -359,18 +436,6 @@ const _desktop = htmlCode => {
 
   socket.emit('ditIsDesktopSocket', code, socketidDesktop);
 
-  socket.on('downHill', IdFromDownHill => {
-
-    if (spelers !== []) {
-      spelers.forEach(speler => {
-        if(speler.getSocketId() === IdFromDownHill){
-          console.log("speler " + speler.playersocketid + " met y pos " + speler.positionY);
-        }
-      });
-    }
-
-  });
-
   socket.on('newplayer', client => {
 
     console.log("new player" + client.socketidMobile);
@@ -378,7 +443,6 @@ const _desktop = htmlCode => {
 
       let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
       console.log(`naar iedereen behalve zichzelf: deze speler is toegevoegd ${player.playersocketid}`);
-      spelers.push(player);
       scene.add(player.render());
     }
   });
@@ -404,6 +468,24 @@ const _mobile = htmlCode => {
     console.log('downhill');
 
     socket.emit('downhillFast', socketidMobile);
+  });
+
+  $('.disturb :submit').click(e => {
+    e.preventDefault();
+    console.log('disturb');
+    socket.emit('disturb', socketidMobile);
+  });
+
+  $('.changecolor :submit').click(e => {
+    e.preventDefault();
+    console.log('changecolor');
+    socket.emit('changecolor', socketidMobile);
+  });
+
+  $('.shuffle :submit').click(e => {
+    e.preventDefault();
+    console.log('shuffle');
+    socket.emit('shuffle', socketidMobile);
   });
 
 };
@@ -436,7 +518,7 @@ const detectSound = (data, player) => {
   }else{
     player.positionY -= 5;
     playerY = player.positionY;
-    socket.emit('yPosDown', player.positionY, player.playersocketid);
+    socket.emit('yPosUp', player.positionY, player.playersocketid);
     //socket.emit("yPosDown", player.positionY, player.playersocketid);
   }
 

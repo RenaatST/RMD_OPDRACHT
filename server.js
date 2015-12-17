@@ -39,6 +39,21 @@ io.on('connection', socket => {
     io.sockets.emit('downHill', socketidDownhill);
   });
 
+  socket.on('disturb', sockIdDisturb => {
+    //console.log(socketidDownhill);
+    io.sockets.emit('disturbToAll', sockIdDisturb);
+  });
+
+  socket.on('changecolor', sockIdColor => {
+    //console.log(socketidDownhill);
+    io.sockets.emit('changecolorToAll', sockIdColor);
+  });
+
+  socket.on('shuffle', sockIdShuffle => {
+    //console.log(socketidDownhill);
+    io.sockets.emit('shuffleToAll', sockIdShuffle);
+  });
+
 
   socket.on('ditIsDesktopSocket', (key, socketidDesktop) => {
     loginWord = key;
