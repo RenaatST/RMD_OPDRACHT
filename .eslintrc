@@ -194,7 +194,8 @@
   "globals": {
     "io": true,
     "THREE": true,
-    "$": true
+    "$": true,
+    "Modernizr": true
   }
 
 }

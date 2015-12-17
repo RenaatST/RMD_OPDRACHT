@@ -4,12 +4,10 @@ import {MathUtil} from './modules/util/';
 import BlueGate from './modules/render/BlueGate';
 import RedGate from './modules/render/RedGate';
 import Player from './modules/render/Player';
-import {html} from './helpers/util';
-import Mobile from './modules/mobile/Mobile';
-
+// import {html} from './helpers/util';
 
 let initialized = false;
-let socketid, clients;
+let socketid;
 let socket = io();
 
 let socketidMobile;
@@ -17,27 +15,22 @@ let socketidDesktop;
 
 ////////////////GAME/////////////////////
 
-
 let bounds;
-let geluid = true;
 let recorder = null;
-let recording = true;
 
 let audioInput = null;
 let volume = null;
 let audioContext = null;
 let lastClap = (new Date()).getTime();
-let scene, camera, renderer;
-let moveX = 0;
-let moveY = 0;
+let scene, camera, renderer, composer;
+let hblur, vblur;
+
 
 //gates
 let hitRed = true;
 let hitBlue = true;
-let rotation = 0;
 let moveCameraUp = false;
 let moveCameraDown = false;
-let switchgate = false;
 let redGateArrX = [];
 let redGateArrY = [];
 let redcube = [];
@@ -46,9 +39,7 @@ let blueGateArrX = [];
 let blueGateArrY = [];
 let bluecube = [];
 let bluecubehit = [];
-let CameraYboven = 0;
 let CameraYonder = 0;
-let speed = 0;
 
 let blueGate;
 let redGate;
@@ -61,15 +52,20 @@ let particleTexture = new THREE.TextureLoader().load( '../assets/image/particle.
 let spelers;
 spelers = [];
 
+let playerX;
+let playerY;
 
 
-const gates = () => {
 
+let shakeCam = true;
+
+const gates = player => {
+  console.log(player);
   for(let i = 0; i < 10; i++){
     let random = (3000 * i);
-    let posX = random + MathUtil.randomBetween(1000,2000);
+    let posX = random + MathUtil.randomBetween(1000, 2000);
     let posY2 = 0-window.innerHeight/2;
-    let posY = window.innerHeight-window.innerHeight/2;
+    let posY1 = window.innerHeight-window.innerHeight/2;
 
     blueGate = new BlueGate(MathUtil.randomPoint(bounds));
     redGate = new RedGate(MathUtil.randomPoint(bounds));
@@ -78,35 +74,87 @@ const gates = () => {
     blueGateArrX.push(posX);
 
     redGateArrY.push(posY2);
-    blueGateArrY.push(posY);
-    redGateArrY.push(posY);
+    blueGateArrY.push(posY1);
+    redGateArrY.push(posY1);
     blueGateArrY.push(posY2);
+
 
     scene.add(redGate._initRed(redGateArrX[i], redGateArrY[i]));
     scene.add(blueGate._initBlue(blueGateArrX[i], blueGateArrY[i]));
+
+
 
     redcube.push(redGate.cube);
     redcubehit.push(redGate._hitRed());
     bluecube.push(blueGate.cube);
     bluecubehit.push(blueGate._hitBlue());
 
+    playerX = player.positionX;
+
   }
 
-  render();
-
+  render(player);
 };
 
 
-let ok = false;
 
-const render = () => {
+// CAMERA //
 
-  CameraYonder = 2;
-  CameraYboven = 2;
+
+const delay = (ms) => {
+  return new Promise(function (resolve, reject) {
+    setTimeout(resolve, ms);
+  });
+};
+
+
+// const flipCamera = () => {
+//   console.log('flip');
+//   camera.rotation.y = -25;
+//   camera.rotation.z = 80.11;
+//   camera.position.z = 3500;
+//   delay(MathUtil.randomBetween(5000, 30000)).then(function() {
+//     nomralCamera();
+//   });
+// };
+
+
+// const normalCamera = () => {
+//   camera.rotation.y = 0;
+//   camera.rotation.z = 0;
+//   camera.position.z = 4000;
+//   camera.position.y = 0;
+//   delay(MathUtil.randomBetween(5000, 30000)).then(function() {
+//     flipCamera();
+//   });
+// };
+
+
+// const shakeCamera = () => {
+//   CameraYonder = MathUtil.randomBetween(50,60);
+//   delay(2000).then(function() {
+//     CameraYonder = 0;
+//   });
+// }
+
+
+
+const render = player => {
+
+  // if(shakeCam){
+  //   delay(5000).then(function() {
+  //     shakeCamera();
+  //   });
+  //   shakeCam = false;
+  // }
+
+  playerX += 5;
+  camera.position.x = playerX;
+
 
   if(moveCameraDown === false){
     camera.position.y += CameraYonder;
-    if(camera.position.y >= window.innerHeight/5){
+    if(camera.position.y >= window.innerHeight/7){
       moveCameraUp = true;
       moveCameraDown = true;
     }
@@ -114,40 +162,51 @@ const render = () => {
 
   if(moveCameraUp === true){
     camera.position.y -= CameraYonder;
-    if(camera.position.y <= -window.innerHeight/10){
+    if(camera.position.y <= -window.innerHeight/7){
       moveCameraUp = false;
       moveCameraDown = false;
     }
   }
 
-
   for(let i = 0; i < redGateArrX.length; i++){
 
     let redY1 = redGateArrY[i] + window.innerHeight/2;
     let redY2 = redGateArrY[i] - window.innerHeight/2;
-    let redX = 3000 + redGateArrX[i];
+    let redX = redGateArrX[i];
+
+
+    if(playerX === redGateArrX[1]){
+      console.log("nu");
+    }
 
     if(hitRed){
-      if(redY1 > moveY && redY2 < moveY && redX < moveX){
-        //console.log('RED GATE - HIT');
+      if(redY1 > playerY && redY2 < playerY && redX < playerX){
+        console.log('RED GATE - HIT');
         scene.remove(redcube[i]);
         scene.add(redcubehit[i]);
       }
-
     }
 
-    let blueY1 = blueGateArrY[i] + window.innerHeight/2;
+
+    let blueY1 = blueGateArrY[i] + window.innerHeight*3;
     let blueY2 = blueGateArrY[i] - window.innerHeight/2;
-    let blueX = 3000 + blueGateArrX[i];
+    let blueX = blueGateArrX[i];
     if(hitBlue){
-      if(blueY1 > moveY && blueY2 < moveY && blueX < moveX){
-        //console.log('BLUE GATE - HIT');
+      if(blueY1 > playerY && blueY2 < playerY && blueX < playerX){
+        console.log('BLUE GATE - HIT');
         scene.remove(bluecube[i]);
         scene.add(bluecubehit[i]);
       }
     }
 
+    // console.log("dit is bluegate x waarde" + blueX)
+    // console.log("dit is bluegate y waarde" + blueY1);
+    // console.log("dit is player y waarde" + playerY);
+
   }
+
+
+
 
 
   // PARTICLES //
@@ -156,36 +215,48 @@ const render = () => {
   let totalParticles = 1;
   let radiusRange = 30;
 
-  for( let i = 0; i < totalParticles; i++ ) {
-    let spriteMaterial = new THREE.SpriteMaterial( { map: particleTexture, color: 0x0000FF} );
-    let sprite = new THREE.Sprite( spriteMaterial );
-    sprite.scale.set( 15, 15, 1.0 ); // imageWidth, imageHeight
-    sprite.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
 
-    sprite.position.setLength( radiusRange * (Math.random() * 0.1 + 0.9) );
-    sprite.material.color.setHSL( Math.random(), Math.random(), Math.random() );
+  for( let i = 0; i < totalParticles; i++ ) {
+
+    var material = new THREE.MeshBasicMaterial({
+      color: '#fff'
+    });
+
+    var radius = 7;
+    var segments = 32;
+
+    var circleGeometry = new THREE.CircleGeometry( radius, segments );
+
+    // let spriteMaterial = new THREE.SpriteMaterial( { map: particleTexture, color: 0x0000FF} );
+    // let sprite = new THREE.Sprite( spriteMaterial );
+    let circle = new THREE.Mesh( circleGeometry, material )
+
+    // circle.scale.set( 15, 15, 1.0 ); // imageWidth, imageHeight
+    // circle.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
+
+    circle.position.setLength( radiusRange * (Math.random() * 0.1 + 1) );
+    // sprite.material.color.setHSL( Math.random(), Math.random(), Math.random() );
     // sprite.opacity = 0.80; // translucent particles
-    sprite.material.blending = THREE.AdditiveBlending; // "glowing" particles
-    particleGroup.add(sprite);
-    particleAttributes.startPosition.push(sprite.position.clone());
+    // sprite.material.blending = THREE.AdditiveBlending; // "glowing" particles
+    particleGroup.add(circle);
+    particleAttributes.startPosition.push(circle.position.clone());
     particleAttributes.randomness.push(Math.random());
   }
 
   scene.add(particleGroup);
 
-  let time = 4 * clock.getElapsedTime();
+  let time = 2 * clock.getElapsedTime();
 
-  for ( let c = 0; c < particleGroup.children.length; c ++ )
-  {
-    let sprite = particleGroup.children[ c ];
-    let a = particleAttributes.randomness[c] + 10;
-    let pulseFactor = Math.sin(a * time) * 0.1+ 0.5;
-    sprite.position.x = particleAttributes.startPosition[c].x * pulseFactor;
-
+  for ( let c = 0; c < particleGroup.children.length; c++){
+    // let sprite = particleGroup.children[ c ];
+    // let a = particleAttributes.randomness[c] + 10;
+    // let pulseFactor = Math.sin(a * time) * 0.1 + 0.5;
+    // sprite.position.x = particleAttributes.startPosition[c].x * pulseFactor;
   }
-  particleGroup.rotation.x = time * 1;
-  // particleGroup.position.x = player.position.x-80;
-  // particleGroup.position.y = player.position.y+5;
+
+  // particleGroup.rotation.x = time * 1;
+  particleGroup.position.x = playerX-50;
+  particleGroup.position.y = playerY;
 
 
   renderer.render(scene, camera);
@@ -199,7 +270,7 @@ const render = () => {
 const init = () => {
 
 
-  socket.on("socketid", data => {
+  socket.on('socketid', data => {
     if(initialized === false){
       socketid = data;
       if(Modernizr.touch) {
@@ -215,18 +286,18 @@ const init = () => {
 
 
   socket.on('thisIsANewSpeler', client => {
-    console.log("aangemaakt");
+    console.log('aangemaakt');
     let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
     scene.add(player.render());
     sound(player);
-
+    gates(player);
   });
 
   socket.on('yPosupdateDown', (thisY, playerId ) => {
     //console.log(thisY + " playerid " + playerId);
 
     if (spelers !== []) {
-      spelers.forEach(function(speler) {
+      spelers.forEach(speler => {
         if (speler.getSocketId() === playerId){
           speler.positionY = thisY;
         }
@@ -238,7 +309,7 @@ const init = () => {
     //console.log(thisY + " playerid " + playerId);
 
     if (spelers !== []) {
-      spelers.forEach(function(speler) {
+      spelers.forEach(speler => {
         if (speler.getSocketId() === playerId){
           speler.positionY = thisY;
         }
@@ -250,27 +321,24 @@ const init = () => {
 
 
 
-const deleteplayer = socketid => {
+const deleteplayer = deleteSocketId => {
   //console.log("this is client we need to delete " + socketid);
   if (spelers !== []) {
-    spelers.forEach(function(speler) {
-        if (speler.getSocketId() === socketid){
-
-          scene.remove(speler.circle);
-        }
+    spelers.forEach(speler => {
+      if(speler.getSocketId() === deleteSocketId){
+        scene.remove(speler.circle);
+      }
     });
   }
 };
-
 
 const _desktop = htmlCode => {
   startBackgroundFromGame();
 
   $('body').append($(htmlCode));
-  //startBackgroundFromGame();
 
-  socket.on('removePlayer', socketid => {
-    deleteplayer(socketid);
+  socket.on('removePlayer', socketidToDelete => {
+    deleteplayer(socketidToDelete);
   });
 
   let code = MathUtil.makeCode();
@@ -283,7 +351,7 @@ const _desktop = htmlCode => {
   socket.on('newplayer', client => {
     if(socketidDesktop !== client.socketidDesktop){
       let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
-      console.log('naar iedereen behalve zichzelf: deze speler is toegevoegd' + player.playersocketid);
+      console.log(`naar iedereen behalve zichzelf: deze speler is toegevoegd ${player.playersocketid}`);
       spelers.push(player);
       scene.add(player.render());
     }
@@ -296,7 +364,7 @@ const _mobile = htmlCode => {
 
   $('body').append($(htmlCode));
 
-  $('.login :submit').click(function(e) {
+  $('.login :submit').click(e => {
     e.preventDefault();
 
     let key = $('.login').find('input[type=text]').val().trim();
@@ -305,8 +373,6 @@ const _mobile = htmlCode => {
   });
 
 };
-
-
 
 const detectSound = (data, player) => {
   let t = (new Date()).getTime(); //krijg tijd binnen
@@ -318,15 +384,24 @@ const detectSound = (data, player) => {
     if(data[i] > 0 && data[i-1] < 0 || data[i] < 0 && data[i-1] > 0) zeroCrossings++;
   }
 
-  if(highAmp > 20){
+  if(highAmp > 10){
     //console.log('up');
-    player.positionY += 19;
+    player.positionY += 10;
+    playerY = player.positionY;
 
-    console.log("sound got from mobileid = " + player.playersocketid);
-    socket.emit("yPosUp", player.positionY, player.playersocketid);
+    // createjs.Tween.get(player.circle, { loop: true })
+    // .to({ x: 400 }, 1000, createjs.Ease.getPowInOut(4))
+    // .to({ alpha: 0, y: 175 }, 500, createjs.Ease.getPowInOut(2))
+    // .to({ alpha: 0, y: 225 }, 100)
+    // .to({ alpha: 1, y: 200 }, 500, createjs.Ease.getPowInOut(2))
+    // .to({ x: 100 }, 800, createjs.Ease.getPowInOut(2));
+
+    console.log(`!sound got from mobileid = ${player.playersocketid}`);
+    socket.emit('yPosUp', player.positionY, player.playersocketid);
 
   }else{
-    //player.positionY -= 3;
+    player.positionY -= 5;
+    playerY = player.positionY;
     //socket.emit("yPosDown", player.positionY, player.playersocketid);
   }
 
@@ -374,10 +449,7 @@ const startBackgroundFromGame = () => {
 
 
   let AudioContext = window.AudioContext || window.webkitAudioContext;
-    audioContext = new AudioContext();
-
-  let lastClap = (new Date()).getTime();
-
+  audioContext = new AudioContext();
 
   bounds = {
     width: window.innerWidth,
@@ -404,10 +476,8 @@ const startBackgroundFromGame = () => {
 
   renderer.setClearColor('#FFAF36', 1);
 
+  // normalCamera();
 
-
-  gates();
-  //sound();
 };
 
 

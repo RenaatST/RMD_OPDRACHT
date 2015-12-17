@@ -16,13 +16,14 @@ export const randomPoint = bounds => {
 };
 
 export const makeCode = () => {
-    var text = "";
-    var possible = "abcdefghijklmnopqrstuvwxyz";
+  var text = '';
+  var possible = 'abcdefghijklmnopqrstuvwxyz';
 
-    for( var i=0; i < 3; i++ )
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
+  for( var i=0; i < 3; i++ ){
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
 
-    return text;
+  return text;
 };
 
 
@@ -30,8 +31,8 @@ export const randomColor = () => {
 
   let letters = '0123456789ABCDEF'.split('');
   let color = '#';
-  for (let i = 0; i < 6; i++ ) {
-      color += letters[Math.floor(Math.random() * 16)];
+  for(let i = 0; i < 6; i++ ) {
+    color += letters[Math.floor(Math.random() * 16)];
   }
   return color;
 
