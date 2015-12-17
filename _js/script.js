@@ -435,6 +435,7 @@ const detectSound = (data, player) => {
   }else{
     player.positionY -= 5;
     playerY = player.positionY;
+    socket.emit('yPosDown', player.positionY, player.playersocketid);
     //socket.emit("yPosDown", player.positionY, player.playersocketid);
   }
 
