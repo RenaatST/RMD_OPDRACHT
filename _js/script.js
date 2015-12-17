@@ -287,6 +287,8 @@ const init = () => {
 
   socket.on('thisIsANewSpeler', client => {
     console.log('aangemaakt');
+    $('.start-desktop').hide();
+
     let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
     scene.add(player.render());
     sound(player);
@@ -333,9 +335,11 @@ const deleteplayer = deleteSocketId => {
 };
 
 const _desktop = htmlCode => {
+
   startBackgroundFromGame();
 
-  $('body').append($(htmlCode));
+
+  $('.container').append($(htmlCode));
 
   socket.on('removePlayer', socketidToDelete => {
     deleteplayer(socketidToDelete);
@@ -343,13 +347,15 @@ const _desktop = htmlCode => {
 
   let code = MathUtil.makeCode();
 
-  $('body').prepend(code);
+  //$('body').prepend(code);
   console.log(code);
+  document.getElementById("putcodehere").innerHTML = code;
 
   socket.emit('ditIsDesktopSocket', code, socketidDesktop);
 
   socket.on('newplayer', client => {
     if(socketidDesktop !== client.socketidDesktop){
+
       let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
       console.log(`naar iedereen behalve zichzelf: deze speler is toegevoegd ${player.playersocketid}`);
       spelers.push(player);
@@ -361,7 +367,7 @@ const _desktop = htmlCode => {
 };
 
 const _mobile = htmlCode => {
-
+  $('.allButtonsController').hide();
   $('body').append($(htmlCode));
 
   $('.login :submit').click(e => {
