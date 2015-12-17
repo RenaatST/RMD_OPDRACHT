@@ -50,6 +50,13 @@ io.on('connection', socket => {
   });
 
 
+  socket.on('gameover', playerId => {
+    console.log('Game Over' + playerId);
+    //socket.broadcast.emit('gameoverplayer', playerId);
+    socket.broadcast.to(playerId).emit('gameoverplayer', playerId);
+  });
+
+
   ////////////////////////////////////////////////////////////////////
   //////////////////////////////BUTTONS///////////////////////////////
   ////////////////////////////////////////////////////////////////////

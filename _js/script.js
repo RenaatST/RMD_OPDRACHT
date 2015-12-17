@@ -106,14 +106,10 @@ const gates = player => {
 };
 
 
-
-// CAMERA //
-
-
-
 const gameOver = () => {
   wrongGate = true;
   if(wrongGate){
+    socket.emit("gameover", playerIDParticles);
     cancelAnimationFrame(render);
     document.querySelector('main').removeChild(renderer.domElement);
         wrongGate = false;
@@ -586,6 +582,14 @@ const _mobile = htmlCode => {
     delay(5000).then(function() {
      document.getElementById("changeView").disabled = false;
     });
+
+
+  });
+
+  socket.on('gameoverplayer', socketIdTodelete => {
+    console.log(document.getElementById("allbuttons"));
+
+    document.getElementById("allbuttons").style.display = "none";
 
 
   });
