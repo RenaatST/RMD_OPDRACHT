@@ -181,7 +181,7 @@ const render = player => {
 
     if(hitRed){
       if(redY1 > playerY && redY2 < playerY && redX < playerX){
-        console.log('RED GATE - HIT');
+        //console.log('RED GATE - HIT');
         scene.remove(redcube[i]);
         scene.add(redcubehit[i]);
       }
@@ -193,7 +193,7 @@ const render = player => {
     let blueX = blueGateArrX[i];
     if(hitBlue){
       if(blueY1 > playerY && blueY2 < playerY && blueX < playerX){
-        console.log('BLUE GATE - HIT');
+        //console.log('BLUE GATE - HIT');
         scene.remove(bluecube[i]);
         scene.add(bluecubehit[i]);
       }
@@ -269,7 +269,6 @@ const render = player => {
 
 const init = () => {
 
-
   socket.on('socketid', data => {
     if(initialized === false){
       socketid = data;
@@ -285,12 +284,21 @@ const init = () => {
   });
 
 
+  socket.on('schermwegdoen', () => {
+    document.getElementById("loginmobile").style.display = "none";
+    document.getElementById("allbuttons").style.display = "inline";
+
+
+
+  });
+
   socket.on('thisIsANewSpeler', client => {
-    console.log('aangemaakt');
-    $('.start-desktop').hide();
-    startBackgroundFromGame();
+
+    document.getElementById("startdeskt").style.display = "none";
+
     let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
     scene.add(player.render());
+    spelers.push(player);
     sound(player);
     gates(player);
   });
@@ -336,7 +344,7 @@ const deleteplayer = deleteSocketId => {
 
 const _desktop = htmlCode => {
 
-
+  startBackgroundFromGame();
   $('.container').append($(htmlCode));
 
   socket.on('removePlayer', socketidToDelete => {
@@ -351,12 +359,25 @@ const _desktop = htmlCode => {
 
   socket.emit('ditIsDesktopSocket', code, socketidDesktop);
 
+  socket.on('downHill', IdFromDownHill => {
+
+    if (spelers !== []) {
+      spelers.forEach(speler => {
+        if(speler.getSocketId() === IdFromDownHill){
+          console.log("speler " + speler.playersocketid + " met y pos " + speler.positionY);
+        }
+      });
+    }
+
+  });
+
   socket.on('newplayer', client => {
+
+    console.log("new player" + client.socketidMobile);
     if(socketidDesktop !== client.socketidDesktop){
 
       let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
       console.log(`naar iedereen behalve zichzelf: deze speler is toegevoegd ${player.playersocketid}`);
-      spelers.push(player);
       scene.add(player.render());
     }
   });
@@ -365,15 +386,23 @@ const _desktop = htmlCode => {
 };
 
 const _mobile = htmlCode => {
-  $('.allButtonsController').hide();
+
+
   $('body').append($(htmlCode));
+  document.getElementById("allbuttons").style.display = "none";
 
   $('.login :submit').click(e => {
     e.preventDefault();
 
     let key = $('.login').find('input[type=text]').val().trim();
     socket.emit('ditIsMobileSocket', key, socketidMobile);
+  });
 
+  $('.downhill :submit').click(e => {
+    e.preventDefault();
+    console.log('downhill');
+
+    socket.emit('downhillFast', socketidMobile);
   });
 
 };
@@ -400,7 +429,7 @@ const detectSound = (data, player) => {
     // .to({ alpha: 1, y: 200 }, 500, createjs.Ease.getPowInOut(2))
     // .to({ x: 100 }, 800, createjs.Ease.getPowInOut(2));
 
-    console.log(`!sound got from mobileid = ${player.playersocketid}`);
+    //console.log(`!sound got from mobileid = ${player.playersocketid}`);
     socket.emit('yPosUp', player.positionY, player.playersocketid);
 
   }else{

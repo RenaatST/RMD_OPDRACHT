@@ -34,6 +34,12 @@ io.on('connection', socket => {
     socket.broadcast.emit('yPosupdate', playerposY, playerId);
   });
 
+  socket.on('downhillFast', socketidDownhill => {
+    //console.log(socketidDownhill);
+    io.sockets.emit('downHill', socketidDownhill);
+  });
+
+
   socket.on('ditIsDesktopSocket', (key, socketidDesktop) => {
     loginWord = key;
     desktopSocketIdInServer = socketidDesktop;
@@ -48,7 +54,7 @@ io.on('connection', socket => {
     if (arrayMetKeys !== []) {
       arrayMetKeys.forEach(function(code) {
         if (code.key === key){
-
+          socket.emit("schermwegdoen");
           console.log("dit is mobile met id " + mobileSocketIdInServer + " and connected to desktop id " + code.id);
 
           let client  = new Client(mobileSocketIdInServer, code.id, randomColor());
@@ -60,7 +66,9 @@ io.on('connection', socket => {
 
           console.log("client to everyone " + client.socketidMobile);
           console.log("desktop to everyone " + client.socketidDesktop);
+
           io.sockets.emit('newplayer', client);
+
 
         }else{
           console.log(key + " je zit verkeerd");
