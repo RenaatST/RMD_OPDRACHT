@@ -41,9 +41,9 @@ io.on('connection', socket => {
     io.sockets.emit('downHill', socketidDownhill);
   });
 
-  socket.on('disturb', sockIdDisturb => {
+  socket.on('disturb', (sockIdDisturb, socketDesktopID) => {
     //console.log(socketidDownhill);
-    io.sockets.emit('disturbToAll', sockIdDisturb);
+    io.sockets.emit('disturbToAll', sockIdDisturb, socketDesktopID);
   });
 
   socket.on('changecolor', sockIdColor => {
@@ -71,10 +71,10 @@ io.on('connection', socket => {
     if (arrayMetKeys !== []) {
       arrayMetKeys.forEach(function(code) {
         if (code.key === key){
-          socket.emit("schermwegdoen");
+
 
           console.log("dit is mobile met id " + mobileSocketIdInServer + " and connected to desktop id " + code.id);
-
+          socket.emit("schermwegdoen", code.id);
           let client  = new Client(mobileSocketIdInServer, code.id, randomColor());
 
           socket.broadcast.to(code.id).emit('thisIsANewSpeler', client);

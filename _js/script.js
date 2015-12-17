@@ -369,11 +369,43 @@ const init = () => {
   });
 
 
-  socket.on('schermwegdoen', () => {
+  socket.on('schermwegdoen', desktopIdSocket => {
     document.getElementById("loginmobile").style.display = "none";
     document.getElementById("allbuttons").style.display = "inline";
 
+    $('.disturb :submit').click(e => {
+      e.preventDefault();
+      console.log('disturb');
 
+
+      if(desktopIdSocket){
+          console.log(desktopIdSocket);
+          socket.emit('disturb', socketidMobile, desktopIdSocket);
+      }
+
+    });
+
+
+
+    $('.downhill :submit').click(e => {
+      e.preventDefault();
+      console.log('downhill');
+      socket.emit('downhillFast', socketidMobile);
+    });
+
+
+
+    $('.changecolor :submit').click(e => {
+      e.preventDefault();
+      console.log('changecolor');
+      socket.emit('changecolor', socketidMobile);
+    });
+
+    $('.shuffle :submit').click(e => {
+      e.preventDefault();
+      console.log('shuffle');
+      socket.emit('shuffle', socketidMobile);
+    });
 
   });
 
@@ -459,6 +491,17 @@ const _desktop = htmlCode => {
     }
   });
 
+  socket.on('disturbToAll', (sockIdDisturb, socketIdDesktop) => {
+
+    console.log("id mobile where disturb comes from " + sockIdDisturb + ' and that id has desktop id ' + socketIdDesktop);
+
+    if(socketidDesktop !== socketIdDesktop){
+
+      shakeCam();
+    }
+
+  });
+
 
 };
 
@@ -473,31 +516,6 @@ const _mobile = htmlCode => {
 
     let key = $('.login').find('input[type=text]').val().trim();
     socket.emit('ditIsMobileSocket', key, socketidMobile);
-  });
-
-  $('.downhill :submit').click(e => {
-    e.preventDefault();
-    console.log('downhill');
-
-    socket.emit('downhillFast', socketidMobile);
-  });
-
-  $('.disturb :submit').click(e => {
-    e.preventDefault();
-    console.log('disturb');
-    socket.emit('disturb', socketidMobile);
-  });
-
-  $('.changecolor :submit').click(e => {
-    e.preventDefault();
-    console.log('changecolor');
-    socket.emit('changecolor', socketidMobile);
-  });
-
-  $('.shuffle :submit').click(e => {
-    e.preventDefault();
-    console.log('shuffle');
-    socket.emit('shuffle', socketidMobile);
   });
 
 };
