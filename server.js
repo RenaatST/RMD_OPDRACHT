@@ -62,9 +62,8 @@ io.on('connection', socket => {
   ////////////////////////////////////////////////////////////////////
 
 
-  socket.on('downhillFast', socketidDownhill => {
-    //console.log(socketidDownhill);
-    io.sockets.emit('downHill', socketidDownhill);
+  socket.on('downhillFast', (socketidDownhill, socketIdDesktopDownHill) => {
+    io.sockets.emit('downHill', socketidDownhill, socketIdDesktopDownHill);
   });
 
   socket.on('disturb', (sockIdDisturb, socketDesktopID) => {
@@ -118,7 +117,6 @@ io.on('connection', socket => {
           console.log("desktop to everyone " + client.socketidDesktop);
 
           io.sockets.emit('newplayer', client);
-
 
         }else{
           console.log(key + " je zit verkeerd");

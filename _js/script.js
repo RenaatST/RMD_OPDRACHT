@@ -52,6 +52,8 @@ let radiusRange = 30;
 let spelers;
 spelers = [];
 
+let ownPlayer;
+
 let playerX;
 let playerY;
 let playerIDParticles;
@@ -210,7 +212,7 @@ const render = player => {
           }else{
             console.log("game over");
             //wrongGate = true;
-            gameOver();
+            //gameOver();
           }
 
 
@@ -238,7 +240,7 @@ const render = player => {
           }else{
             console.log("game over");
             //wrongGate = true;
-            gameOver();
+            //gameOver();
 
           }
           scene.remove(bluecube[i]);
@@ -338,23 +340,6 @@ const init = () => {
 
 
 
-  socket.on('downHill', IdFromDownHill => {
-
-    if (spelers !== []) {
-      spelers.forEach(speler => {
-        if(speler.getSocketId() === IdFromDownHill){
-          //console.log("Downhill " + speler.playersocketid + " met y pos " + speler.positionY);
-
-          /////////////////////////////////DOWNHILL/////////////////////////////////////////
-
-
-
-
-        }
-      });
-    }
-
-  });
 
   socket.on('disturbToAll', sockIdDisturb => {
 
@@ -401,7 +386,7 @@ const init = () => {
 
     $('.downhill :submit').click(e => {
       e.preventDefault();
-      socket.emit('downhillFast', socketidMobile);
+      socket.emit('downhillFast', socketidMobile, desktopIdSocket);
     });
 
 
@@ -423,10 +408,12 @@ const init = () => {
 
   socket.on('thisIsANewSpeler', client => {
 
+
     document.getElementById("startdeskt").style.display = "none";
 
     let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
     scene.add(player.render());
+    ownPlayer = player;
 
     sound(player);
     gates(player);
@@ -509,7 +496,16 @@ const _desktop = htmlCode => {
       document.body.appendChild(text);
     }
 
+
+
+
   });
+
+  socket.on('downHill', (IdFromDownHill, idFromDesktopDownHill) => {
+    //console.log('id from downhill ' + IdFromDownHill + ' and destkop' + idFromDesktopDownHill);
+    ownPlayer.positionY -= 200;
+  });
+
 
 
   socket.on('changeCameraViewToAll', (sockIdChangeView, socketDesktopID) => {
@@ -591,8 +587,10 @@ const _mobile = htmlCode => {
 
     document.getElementById("allbuttons").style.display = "none";
 
-
   });
+
+
+
 
 };
 
