@@ -298,7 +298,7 @@ const init = () => {
 
     let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
     scene.add(player.render());
-    spelers.push(player);
+
     sound(player);
     gates(player);
   });
@@ -378,6 +378,7 @@ const _desktop = htmlCode => {
 
       let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
       console.log(`naar iedereen behalve zichzelf: deze speler is toegevoegd ${player.playersocketid}`);
+      spelers.push(player);
       scene.add(player.render());
     }
   });
