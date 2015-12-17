@@ -22,13 +22,10 @@ let audioInput = null;
 let volume = null;
 let audioContext = null;
 let lastClap = (new Date()).getTime();
-let scene, camera, renderer, composer;
-let hblur, vblur;
+let scene, camera, renderer;
 
 
-//gates
-let hitRed = true;
-let hitBlue = true;
+
 let moveCameraUp = false;
 let moveCameraDown = false;
 let redGateArrX = [];
@@ -48,15 +45,20 @@ let particleGroup;
 let particleAttributes;
 let clock = new THREE.Clock();
 let particleTexture = new THREE.TextureLoader().load( '../assets/image/particle.png');
+let totalParticles = 1;
+let radiusRange = 30;
+
 
 let spelers;
 spelers = [];
 
 let playerX;
 let playerY;
+let playerIDParticles;
+let desktopIDParticles;
+let SpelerColor;
 
-
-
+let wrongGate = false;
 let shakeCam = false;
 
 
@@ -92,15 +94,36 @@ const gates = player => {
     bluecubehit.push(blueGate._hitBlue());
 
     playerX = player.positionX;
-
+    playerIDParticles = player.playersocketid;
+    desktopIDParticles = player.desktopsocketid;
+    SpelerColor = player.color;
   }
 
+
+
   render(player);
+
 };
 
 
 
 // CAMERA //
+
+
+
+const gameOver = () => {
+  wrongGate = true;
+  if(wrongGate){
+    cancelAnimationFrame(render);
+    document.querySelector('main').removeChild(renderer.domElement);
+        wrongGate = false;
+    document.getElementById("errorinfo").style.display = "inline";
+    document.getElementById("gameover").style.display = "inline";
+    console.log("de allbuttons id" + document.getElementById("allbuttons"));
+    // document.getElementById("allbuttons").style.display = "none";
+    wrongGate = false;
+  }
+};
 
 
 const delay = (ms) => {
@@ -110,26 +133,26 @@ const delay = (ms) => {
 };
 
 
-// const flipCamera = () => {
-//   console.log('flip');
-//   camera.rotation.y = -25;
-//   camera.rotation.z = 80.11;
-//   camera.position.z = 3500;
-//   delay(MathUtil.randomBetween(5000, 30000)).then(function() {
-//     nomralCamera();
-//   });
-// };
+const flipCamera = () => {
+  console.log('flip');
+  camera.rotation.y = -25;
+  camera.rotation.z = 80.11;
+  camera.position.z = 3500;
+  delay(5000).then(function() {
+    normalCamera();
+  });
+};
 
 
-// const normalCamera = () => {
-//   camera.rotation.y = 0;
-//   camera.rotation.z = 0;
-//   camera.position.z = 4000;
-//   camera.position.y = 0;
-//   delay(MathUtil.randomBetween(5000, 30000)).then(function() {
-//     flipCamera();
-//   });
-// };
+const normalCamera = () => {
+  camera.rotation.y = 0;
+  camera.rotation.z = 0;
+  camera.position.z = 4000;
+  camera.position.y = 0;
+  // delay(MathUtil.randomBetween(5000, 30000)).then(function() {
+  //   flipCamera();
+  // });
+};
 
 
 const shakeCamera = () => {
@@ -148,7 +171,7 @@ const render = player => {
     shakeCam = false;
   }
 
-  playerX += 5;
+  playerX += 10;
   camera.position.x = playerX;
 
 
@@ -176,54 +199,95 @@ const render = player => {
     let redX = redGateArrX[i];
     let arrRed = [];
 
-    if(hitRed){
-      for (let i = redX - 50; i < redX + 50; i++) {
-        arrRed.push(i);
-      }
-      if(arrRed !== []){
-        arrRed.forEach(rood => {
-         if(redY1 > playerY && redY2 < playerY && rood === playerX){
-            console.log('RED GATE - HIT');
-            scene.remove(redcube[i]);
-            scene.add(redcubehit[i]);
+
+
+    for (let i = redX - 50; i < redX + 50; i++) {
+      arrRed.push(i);
+    }
+    if(arrRed !== []){
+      arrRed.forEach(rood => {
+       if(redY1 > playerY && redY2 < playerY && rood === playerX){
+          //console.log('RED GATE - HIT');
+
+          if(SpelerColor == '#CA473E'){
+            console.log("dit is het juist kleur");
+          }else{
+            console.log("game over");
+            //wrongGate = true;
+            gameOver();
           }
-        });
-      }
+
+
+          scene.remove(redcube[i]);
+          scene.add(redcubehit[i]);
+        }
+      });
     }
 
     let blueY1 = blueGateArrY[i] + window.innerHeight;
     let blueY2 = blueGateArrY[i] - window.innerHeight;
     let blueX = blueGateArrX[i];
     let arrBlue = [];
-    if(hitBlue){
-      for (let i = blueX - 50; i < blueX + 50; i++) {
-        arrBlue.push(i);
-      }
-      if(arrBlue !== []){
-        arrBlue.forEach(blauw => {
-         if(blueY1 > playerY && blueY2 < playerY && blauw === playerX){
-            console.log('BLUE GATE - HIT');
-            scene.remove(bluecube[i]);
-            scene.add(bluecubehit[i]);
+
+    for (let i = blueX - 50; i < blueX + 50; i++) {
+      arrBlue.push(i);
+    }
+    if(arrBlue !== []){
+      arrBlue.forEach(blauw => {
+       if(blueY1 > playerY && blueY2 < playerY && blauw === playerX){
+          //console.log('BLUE GATE - HIT');
+
+          if(SpelerColor == '#2F94D1'){
+            console.log("dit is het juist kleur");
+          }else{
+            console.log("game over");
+            //wrongGate = true;
+            gameOver();
+
           }
-        });
-      }
+          scene.remove(bluecube[i]);
+          scene.add(bluecubehit[i]);
+        }
+      });
     }
 
   }
 
-
-
-
-
-
-  // PARTICLES //
   particleGroup = new THREE.Object3D();
   particleAttributes = { startSize: [], startPosition: [], randomness: [] };
-  let totalParticles = 1;
-  let radiusRange = 30;
 
 
+  particlesAdd();
+  scene.add(particleGroup);
+
+  let time = 2 * clock.getElapsedTime();
+
+  for ( let c = 0; c < particleGroup.children.length; c++){
+    // let sprite = particleGroup.children[ c ];
+    // let a = particleAttributes.randomness[c] + 10;
+    // let pulseFactor = Math.sin(a * time) * 0.1 + 0.5;
+    // sprite.position.x = particleAttributes.startPosition[c].x * pulseFactor;
+  }
+
+  // particleGroup.rotation.x = time * 1;
+  particleGroup.position.x = playerX-50;
+  particleGroup.position.y = playerY;
+
+
+  // console.log(playerX);
+  // console.log(playerY);
+  // console.log(playerIDParticles);
+
+  socket.emit("particles", playerX, playerY, playerIDParticles, desktopIDParticles);
+
+
+
+
+  renderer.render(scene, camera);
+  requestAnimationFrame(() => render());
+};
+
+const particlesAdd = () => {
   for( let i = 0; i < totalParticles; i++ ) {
 
     var material = new THREE.MeshBasicMaterial({
@@ -251,31 +315,15 @@ const render = player => {
     particleAttributes.randomness.push(Math.random());
   }
 
-  scene.add(particleGroup);
 
-  let time = 2 * clock.getElapsedTime();
-
-  for ( let c = 0; c < particleGroup.children.length; c++){
-    // let sprite = particleGroup.children[ c ];
-    // let a = particleAttributes.randomness[c] + 10;
-    // let pulseFactor = Math.sin(a * time) * 0.1 + 0.5;
-    // sprite.position.x = particleAttributes.startPosition[c].x * pulseFactor;
-  }
-
-  // particleGroup.rotation.x = time * 1;
-  particleGroup.position.x = playerX-50;
-  particleGroup.position.y = playerY;
-
-
-  renderer.render(scene, camera);
-  requestAnimationFrame(() => render());
 };
 
 
 
 
-
 const init = () => {
+
+
 
   socket.on('socketid', data => {
     if(initialized === false){
@@ -291,12 +339,15 @@ const init = () => {
     initialized = true;
   });
 
+
+
+
   socket.on('downHill', IdFromDownHill => {
 
     if (spelers !== []) {
       spelers.forEach(speler => {
         if(speler.getSocketId() === IdFromDownHill){
-          console.log("Downhill " + speler.playersocketid + " met y pos " + speler.positionY);
+          //console.log("Downhill " + speler.playersocketid + " met y pos " + speler.positionY);
 
           /////////////////////////////////DOWNHILL/////////////////////////////////////////
 
@@ -314,53 +365,22 @@ const init = () => {
     if (spelers !== []) {
       spelers.forEach(speler => {
         if(speler.getSocketId() === sockIdDisturb){
-          console.log("Disturb  " + speler.playersocketid + " met y pos " + speler.positionY);
-
-          /////////////////////////////////DISTURB/////////////////////////////////////////
-
+          //console.log("Disturb  " + speler.playersocketid + " met y pos " + speler.positionY);
           shakeCam = true;
-
-
-
-
         }
       });
     }
-
   });
 
-  socket.on('changecolorToAll', sockIdShuffle => {
-
-    if (spelers !== []) {
-      spelers.forEach(speler => {
-        if(speler.getSocketId() === sockIdShuffle){
-          console.log("Change color " + speler.playersocketid + " met y pos " + speler.positionY);
-
-
-          /////////////////////////////////CHANGE COLOR/////////////////////////////////////////
-
-
-
-
-
-        }
-      });
-    }
-
-  });
 
   socket.on('shuffleToAll', sockIdColor => {
 
     if (spelers !== []) {
       spelers.forEach(speler => {
         if(speler.getSocketId() === sockIdColor){
-          console.log("Shuffle all " + speler.playersocketid + " met y pos " + speler.positionY);
+          //console.log("Shuffle all " + speler.playersocketid + " met y pos " + speler.positionY);
 
           /////////////////////////////////SHUFFLE/////////////////////////////////////////
-
-
-
-
 
         }
       });
@@ -375,35 +395,31 @@ const init = () => {
 
     $('.disturb :submit').click(e => {
       e.preventDefault();
-      console.log('disturb');
-
 
       if(desktopIdSocket){
-          console.log(desktopIdSocket);
           socket.emit('disturb', socketidMobile, desktopIdSocket);
       }
 
     });
 
 
-
     $('.downhill :submit').click(e => {
       e.preventDefault();
-      console.log('downhill');
       socket.emit('downhillFast', socketidMobile);
     });
 
 
-
-    $('.changecolor :submit').click(e => {
+    $('.flipview :submit').click(e => {
       e.preventDefault();
-      console.log('changecolor');
-      socket.emit('changecolor', socketidMobile);
+
+      if(desktopIdSocket){
+          socket.emit('flipview', socketidMobile, desktopIdSocket);
+      }
+
     });
 
     $('.shuffle :submit').click(e => {
       e.preventDefault();
-      console.log('shuffle');
       socket.emit('shuffle', socketidMobile);
     });
 
@@ -424,11 +440,9 @@ const init = () => {
 
 
     if (spelers !== []) {
-      console.log(spelers);
       spelers.forEach(speler => {
         if (speler.getSocketId() === playerId){
           speler.positionY = thisY;
-          console.log(thisY + " playerid " + playerId);
         }
       });
     }
@@ -441,7 +455,7 @@ const init = () => {
       spelers.forEach(speler => {
         if (speler.getSocketId() === playerId){
           speler.positionY = thisY;
-              console.log(thisY + " playerid " + playerId);
+            //console.log(thisY + " playerid " + playerId);
         }
       });
     }
@@ -485,28 +499,75 @@ const _desktop = htmlCode => {
     if(socketidDesktop !== client.socketidDesktop){
 
       let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
-      console.log(`naar iedereen behalve zichzelf: deze speler is toegevoegd ${player.playersocketid}`);
+      //console.log(`naar iedereen behalve zichzelf: deze speler is toegevoegd ${player.playersocketid}`);
       scene.add(player.render());
       spelers.push(player);
+    }else{
+      let text = document.createElement('div');
+      text.style.position = 'absolute';
+      text.style.width = 100;
+      text.style.height = 100;
+      text.innerHTML = "ME";
+      text.style.top = 200+"px";
+      text.style.left = 200+"px";
+      document.body.appendChild(text);
     }
+
   });
 
-  socket.on('disturbToAll', (sockIdDisturb, socketIdDesktop) => {
 
-    console.log("id mobile where disturb comes from " + sockIdDisturb + ' and that id has desktop id ' + socketIdDesktop);
-
-    if(socketidDesktop !== socketIdDesktop){
-
-      shakeCam();
-    }
-
+  socket.on('changeCameraViewToAll', (sockIdChangeView, socketDesktopID) => {
+    flipCamera();
   });
+
+  // socket.on('sendParticlesToEveryone', (partPosX, partPosY, partMobileId, desktopID) => {
+  //   //console.log("particle x " + partPosX + " particle y " + partPosY + " partMobileId " + partMobileId);
+
+  //   //particles(partPosX, partPosY, partMobileId);
+  //   if (spelers !== []) {
+  //     spelers.forEach(speler => {
+  //       if(socket.id === desktopID){
+
+  //         particleGroup = new THREE.Object3D();
+  //         particleAttributes = { startSize: [], startPosition: [], randomness: [] };
+
+
+  //         particlesAdd();
+  //         scene.add(particleGroup);
+
+  //         let time = 2 * clock.getElapsedTime();
+
+  //         for ( let c = 0; c < particleGroup.children.length; c++){
+  //           // let sprite = particleGroup.children[ c ];
+  //           // let a = particleAttributes.randomness[c] + 10;
+  //           // let pulseFactor = Math.sin(a * time) * 0.1 + 0.5;
+  //           // sprite.position.x = particleAttributes.startPosition[c].x * pulseFactor;
+  //         }
+
+  //         // particleGroup.rotation.x = time * 1;
+  //         particleGroup.position.x = partPosX;
+  //         particleGroup.position.y = partPosY;
+
+  //       }
+  //     });
+  //   }
+
+  // });
 
 
 };
 
 const _mobile = htmlCode => {
 
+  let randomBool = MathUtil.randomBetween(0,1);
+
+  if(randomBool == 1){
+    SpelerColor = '#CA473E';
+  }
+
+  if(randomBool == 0){
+    SpelerColor = '#2F94D1';
+  }
 
   $('body').append($(htmlCode));
   document.getElementById("allbuttons").style.display = "none";
@@ -515,7 +576,18 @@ const _mobile = htmlCode => {
     e.preventDefault();
 
     let key = $('.login').find('input[type=text]').val().trim();
-    socket.emit('ditIsMobileSocket', key, socketidMobile);
+    socket.emit('ditIsMobileSocket', key, socketidMobile, SpelerColor);
+  });
+
+  socket.on('changeCameraViewToAll', (sockIdChangeView, socketDesktopID) => {
+
+    document.getElementById("changeView").disabled = true;
+
+    delay(5000).then(function() {
+     document.getElementById("changeView").disabled = false;
+    });
+
+
   });
 
 };
@@ -534,22 +606,22 @@ const detectSound = (data, player) => {
     //console.log('up');
     player.positionY += 10;
     playerY = player.positionY;
+    if(camera.position.z < 5000){
+      camera.position.z -= 20;
+    }
 
-    // createjs.Tween.get(player.circle, { loop: true })
-    // .to({ x: 400 }, 1000, createjs.Ease.getPowInOut(4))
-    // .to({ alpha: 0, y: 175 }, 500, createjs.Ease.getPowInOut(2))
-    // .to({ alpha: 0, y: 225 }, 100)
-    // .to({ alpha: 1, y: 200 }, 500, createjs.Ease.getPowInOut(2))
-    // .to({ x: 100 }, 800, createjs.Ease.getPowInOut(2));
-
-    //console.log(`!sound got from mobileid = ${player.playersocketid}`);
     socket.emit('yPosUp', player.positionY, player.playersocketid);
 
   }else{
     player.positionY -= 5;
     playerY = player.positionY;
+    if(camera.position.z < 4000){
+     camera.position.z += 20;
+    }else{
+      camera.position.z = 4000
+    }
     socket.emit('yPosDown', player.positionY, player.playersocketid);
-    //socket.emit("yPosDown", player.positionY, player.playersocketid);
+
   }
 
   return false;
@@ -610,7 +682,7 @@ const startBackgroundFromGame = () => {
     90, 0
   );
 
-  renderer = new THREE.WebGLRenderer();
+  renderer = new THREE.WebGLRenderer( { alpha: true } );
 
   renderer.setSize(
     window.innerWidth,
@@ -621,9 +693,6 @@ const startBackgroundFromGame = () => {
 
   camera.position.z = 4000;
 
-  renderer.setClearColor('#FAE17D', 1);
-
-  // normalCamera();
 
 };
 

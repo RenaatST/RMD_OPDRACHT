@@ -25,7 +25,7 @@ export default class Player extends EventEmitter {
     let y = this.positionY;
 
 
-    this.positionX += 2.5;
+    this.positionX += 5;
 
 
     this.circle.position.x = x;
@@ -44,14 +44,6 @@ export default class Player extends EventEmitter {
     let circle = new THREE.Mesh(geometry, material);
     this.circle = circle;
 
-    // let spriteMaterial = new THREE.SpriteMaterial({
-    //   map: new THREE.TextureLoader().load('../assets/image/nodemon.png'),
-    //   color: color, transparent: true, blending: THREE.AdditiveBlending
-    // });
-
-    // let sprite = new THREE.Sprite( spriteMaterial );
-    // sprite.scale.set(75, 75, 1.0);
-    // circle.add(sprite);
 
     circle.position.x = x;
     circle.position.y = y;

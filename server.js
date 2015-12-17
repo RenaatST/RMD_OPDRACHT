@@ -21,10 +21,23 @@ app.use(express.static(__dirname + '/public'));
 
 io.on('connection', socket => {
   socketid = socket.id;
-
-  console.log(arrayMetKeys);
-
   socket.emit("socketid",socket.id);
+
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  //////////////////////////UPDATES PLAYERS///////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+
+
+
+  socket.on('particles', (playerX, playerY, playerID, desktopID) => {
+    // console.log('player ' + playerID);
+    // console.log('player sends particles x ' + playerX);
+    // console.log('player sends particles x ' + playerY);
+    socket.broadcast.emit('sendParticlesToEveryone', playerX, playerY, playerID, desktopID);
+  });
+
 
   socket.on('yPosDown', (playerposY, playerId) => {
     //console.log('dooooown' + playerposY + ' player id: ' + playerId);
@@ -36,6 +49,12 @@ io.on('connection', socket => {
     socket.broadcast.emit('yPosUpAllPlayers', playerposY, playerId);
   });
 
+
+  ////////////////////////////////////////////////////////////////////
+  //////////////////////////////BUTTONS///////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+
+
   socket.on('downhillFast', socketidDownhill => {
     //console.log(socketidDownhill);
     io.sockets.emit('downHill', socketidDownhill);
@@ -46,9 +65,9 @@ io.on('connection', socket => {
     io.sockets.emit('disturbToAll', sockIdDisturb, socketDesktopID);
   });
 
-  socket.on('changecolor', sockIdColor => {
+  socket.on('flipview', (sockIdChangeView, socketDesktopID) => {
     //console.log(socketidDownhill);
-    io.sockets.emit('changecolorToAll', sockIdColor);
+    io.sockets.emit('changeCameraViewToAll', sockIdChangeView, socketDesktopID);
   });
 
   socket.on('shuffle', sockIdShuffle => {
@@ -56,6 +75,12 @@ io.on('connection', socket => {
     io.sockets.emit('shuffleToAll', sockIdShuffle);
   });
 
+
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////DESKTOP OF MOBILE///////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
 
   socket.on('ditIsDesktopSocket', (key, socketidDesktop) => {
     loginWord = key;
@@ -65,7 +90,7 @@ io.on('connection', socket => {
     arrayMetKeys.push({id: desktopSocketIdInServer, key: loginWord});
   });
 
-  socket.on('ditIsMobileSocket', (key, socketidMobile) => {
+  socket.on('ditIsMobileSocket', (key, socketidMobile, color) => {
     mobileSocketIdInServer = socketidMobile;
 
     if (arrayMetKeys !== []) {
@@ -75,7 +100,7 @@ io.on('connection', socket => {
 
           console.log("dit is mobile met id " + mobileSocketIdInServer + " and connected to desktop id " + code.id);
           socket.emit("schermwegdoen", code.id);
-          let client  = new Client(mobileSocketIdInServer, code.id, randomColor());
+          let client  = new Client(mobileSocketIdInServer, code.id, color);
 
           socket.broadcast.to(code.id).emit('thisIsANewSpeler', client);
           console.log("client to yourself " + client.socketidMobile);
@@ -97,6 +122,11 @@ io.on('connection', socket => {
   });
 
 
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  ///////////////////////////Disconnect///////////////////////////////
+  ////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////
 
 
   socket.on('disconnect', () => {
