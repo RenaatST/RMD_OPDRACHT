@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* Fix user-agent */
 * {
   box-sizing: border-box;
@@ -181,10 +182,6 @@ ul {
   position: absolute;
   text-align: center;
   color: #6ac683;
-}
-
-.start-desktop {
-  margin-top: 200px;
 }
 
 .cirkels-desktop {
@@ -460,4 +457,10 @@ strong {
   height: 200px;
   margin: 0 auto;
   visibility: hidden;
+}
+
+.background  {
+  width: 100%;
+  height: 100%;
+  background-color: #FAE17D;
 }

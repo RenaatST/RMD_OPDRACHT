@@ -288,7 +288,7 @@ const init = () => {
   socket.on('thisIsANewSpeler', client => {
     console.log('aangemaakt');
     $('.start-desktop').hide();
-
+    startBackgroundFromGame();
     let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
     scene.add(player.render());
     sound(player);
@@ -335,8 +335,6 @@ const deleteplayer = deleteSocketId => {
 };
 
 const _desktop = htmlCode => {
-
-  startBackgroundFromGame();
 
 
   $('.container').append($(htmlCode));
@@ -480,7 +478,7 @@ const startBackgroundFromGame = () => {
 
   camera.position.z = 4000;
 
-  renderer.setClearColor('#FFAF36', 1);
+  renderer.setClearColor('#FAE17D', 1);
 
   // normalCamera();
 
