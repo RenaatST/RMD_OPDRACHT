@@ -383,30 +383,33 @@ const init = () => {
 
     let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
     scene.add(player.render());
-    spelers.push(player);
+
     sound(player);
     gates(player);
   });
 
-  socket.on('yPosupdateDown', (thisY, playerId ) => {
-    //console.log(thisY + " playerid " + playerId);
+  socket.on('yPosDownAllPlayers', (thisY, playerId ) => {
+
 
     if (spelers !== []) {
+      console.log(spelers);
       spelers.forEach(speler => {
         if (speler.getSocketId() === playerId){
           speler.positionY = thisY;
+          console.log(thisY + " playerid " + playerId);
         }
       });
     }
   });
 
-  socket.on('yPosupdate', (thisY, playerId ) => {
-    //console.log(thisY + " playerid " + playerId);
+  socket.on('yPosUpAllPlayers', (thisY, playerId ) => {
+
 
     if (spelers !== []) {
       spelers.forEach(speler => {
         if (speler.getSocketId() === playerId){
           speler.positionY = thisY;
+              console.log(thisY + " playerid " + playerId);
         }
       });
     }
@@ -452,6 +455,7 @@ const _desktop = htmlCode => {
       let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
       console.log(`naar iedereen behalve zichzelf: deze speler is toegevoegd ${player.playersocketid}`);
       scene.add(player.render());
+      spelers.push(player);
     }
   });
 
@@ -526,7 +530,7 @@ const detectSound = (data, player) => {
   }else{
     player.positionY -= 5;
     playerY = player.positionY;
-    socket.emit('yPosUp', player.positionY, player.playersocketid);
+    socket.emit('yPosDown', player.positionY, player.playersocketid);
     //socket.emit("yPosDown", player.positionY, player.playersocketid);
   }
 

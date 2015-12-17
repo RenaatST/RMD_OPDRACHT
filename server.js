@@ -27,11 +27,13 @@ io.on('connection', socket => {
   socket.emit("socketid",socket.id);
 
   socket.on('yPosDown', (playerposY, playerId) => {
-    socket.broadcast.emit('yPosupdateDown', playerposY, playerId);
+    //console.log('dooooown' + playerposY + ' player id: ' + playerId);
+    socket.broadcast.emit('yPosDownAllPlayers', playerposY, playerId);
   });
 
   socket.on('yPosUp', (playerposY, playerId) => {
-    socket.broadcast.emit('yPosupdate', playerposY, playerId);
+    //console.log('uuuup' + playerposY + ' player id: ' + playerId);
+    socket.broadcast.emit('yPosUpAllPlayers', playerposY, playerId);
   });
 
   socket.on('downhillFast', socketidDownhill => {
@@ -70,6 +72,7 @@ io.on('connection', socket => {
       arrayMetKeys.forEach(function(code) {
         if (code.key === key){
           socket.emit("schermwegdoen");
+
           console.log("dit is mobile met id " + mobileSocketIdInServer + " and connected to desktop id " + code.id);
 
           let client  = new Client(mobileSocketIdInServer, code.id, randomColor());
