@@ -60,7 +60,6 @@ let playerIDParticles;
 let desktopIDParticles;
 let SpelerColor;
 
-let wrongGate = false;
 let shakeCam = false;
 
 
@@ -108,18 +107,16 @@ const gates = player => {
 };
 
 
+
+let fix = true;
 const gameOver = () => {
-  wrongGate = true;
-  if(wrongGate){
-    socket.emit("gameover", playerIDParticles);
+  if(fix){
     cancelAnimationFrame(render);
     document.querySelector('main').removeChild(renderer.domElement);
-        wrongGate = false;
+    socket.emit("gameover", playerIDParticles);
     document.getElementById("errorinfo").style.display = "inline";
     document.getElementById("gameover").style.display = "inline";
-    console.log("de allbuttons id" + document.getElementById("allbuttons"));
-    // document.getElementById("allbuttons").style.display = "none";
-    wrongGate = false;
+    fix = false;
   }
 };
 
@@ -211,8 +208,7 @@ const render = player => {
             console.log("dit is het juist kleur");
           }else{
             console.log("game over");
-            //wrongGate = true;
-            //gameOver();
+            gameOver();
           }
 
 
@@ -239,8 +235,7 @@ const render = player => {
             console.log("dit is het juist kleur");
           }else{
             console.log("game over");
-            //wrongGate = true;
-            //gameOver();
+            gameOver();
 
           }
           scene.remove(bluecube[i]);
@@ -584,9 +579,9 @@ const _mobile = htmlCode => {
 
   socket.on('gameoverplayer', socketIdTodelete => {
     console.log(document.getElementById("allbuttons"));
-
     document.getElementById("allbuttons").style.display = "none";
-
+    document.getElementById("loginmobile").style.display = "inline-block";
+    $('.codeloginmobile').val('');
   });
 
 
