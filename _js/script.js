@@ -314,6 +314,8 @@ const init = () => {
 
   speed = 5;
 
+
+
   socket.on('socketid', data => {
     if(initialized === false){
       socketid = data;
@@ -439,9 +441,20 @@ const init = () => {
   });
 
   socket.on('thisIsANewSpeler', client => {
+    document.getElementById("startinfo").style.display = "inline-block";
+    document.getElementById("backgroundBalls1").style.display = "none";
+    document.getElementById("backgroundBalls2").style.display = "inline-block";
 
+    delay(5000).then(function() {
+      document.getElementById("footer").style.display = "none";
+      document.getElementById("startinfo").style.display = "none";
+    })
     document.getElementById("startdeskt").style.display = "none";
 
+    $("#footer").addClass("animate-footer");
+    delay(2000).then(function() {
+      document.getElementById("footer").style.display = "none";
+    })
     let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color, document.createElement('div'));
     scene.add(player.render());
     ownPlayer = player;
@@ -588,23 +601,31 @@ const detectSound = (data, player) => {
 
   if(highAmp > 10){
     //console.log('up');
-    player.positionY += 20;
-    playerY = player.positionY;
-    if(camera.position.z < 4500){
-      camera.position.z -= 20;
-    }
+      player.positionY += 20;
+      playerY = player.positionY;
 
-    socket.emit('yPosUp', player.positionY, player.playersocketid);
+    if(playerY < window.innerHeight*2){
+
+      if(camera.position.z < 4500){
+        camera.position.z -= 20;
+      }
+
+      socket.emit('yPosUp', player.positionY, player.playersocketid);
+    }
 
   }else{
     player.positionY -= 15;
     playerY = player.positionY;
-    if(camera.position.z < 4000){
-     camera.position.z += 20;
-    }else{
-      camera.position.z = 4000
+
+    if(playerY < -window.innerHeight*2){
+      if(camera.position.z < 4000){
+       camera.position.z += 20;
+      }else{
+        camera.position.z = 4000
+      }
+
+      socket.emit('yPosDown', player.positionY, player.playersocketid);
     }
-    socket.emit('yPosDown', player.positionY, player.playersocketid);
 
   }
 

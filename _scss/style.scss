@@ -21,6 +21,25 @@ html, body {
   padding: 0;
   background-color: #FAE17D;
   overflow: hidden;
+  min-height: 100%;
+  position: relative;
+}
+
+.bbackground {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  transform-style: preserve-3d;
+}
+
+
+
+.bbackground2 {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  transform-style: preserve-3d;
+  display: none;
 }
 
 
@@ -94,7 +113,7 @@ ul {
 }
 
 .downhill input[type='submit']{
-  margin-top: 33%;
+  margin-top: 25%;
   -webkit-appearance: none;
   font-family: 'Bariol-Bold';
   background: none;
@@ -107,7 +126,7 @@ ul {
   position: absolute;
   margin-left: -170px;
   left: 50%;
-  height: 70px;
+  height: 80px;
   -webkit-border-radius: 15px;
   -moz-border-radius: 15px;
   border-radius: 15px;
@@ -118,9 +137,21 @@ ul {
   box-shadow: 0px 0px 6px -1px rgba(0,0,0,0.75);
 }
 
+.downhill-info {
+  margin-top: 150px;
+  font-family: 'Bariol-Bold';
+  font-size: 1em;
+  font-weight: bolder;
+  width: 340px;
+  margin-left: -170px;
+  left: 50%;
+  position: absolute;
+  text-align: center;
+  color: #F8F8F8;
+}
 
 .disturb input[type='submit']{
-  margin-top: 56%;
+  margin-top: 50%;
   -webkit-appearance: none;
   font-family: 'Bariol-Bold';
   background: none;
@@ -133,7 +164,7 @@ ul {
   position: absolute;
   margin-left: -170px;
   left: 50%;
-  height: 70px;
+  height: 80px;
   -webkit-border-radius: 15px;
   -moz-border-radius: 15px;
   border-radius: 15px;
@@ -144,9 +175,22 @@ ul {
   box-shadow: 0px 0px 6px -1px rgba(0,0,0,0.75);
 }
 
+.disturb-info {
+  margin-top: 245px;
+  font-family: 'Bariol-Bold';
+  font-size: 1em;
+  font-weight: bolder;
+  width: 340px;
+  margin-left: -170px;
+  left: 50%;
+  position: absolute;
+  text-align: center;
+  color: #DADAD8;
+}
+
 
 .flipview input[type='submit']{
-  margin-top: 79%;
+  margin-top: 75%;
   -webkit-appearance: none;
   font-family: 'Bariol-Bold';
   background: none;
@@ -159,20 +203,31 @@ ul {
   position: absolute;
   margin-left: -170px;
   left: 50%;
-  height: 70px;
+  height: 80px;
   -webkit-border-radius: 15px;
   -moz-border-radius: 15px;
   border-radius: 15px;
   background-color: #A77BC3;
-
   -webkit-box-shadow: 0px 0px 6px -1px rgba(0,0,0,0.75);
   -moz-box-shadow: 0px 0px 6px -1px rgba(0,0,0,0.75);
   box-shadow: 0px 0px 6px -1px rgba(0,0,0,0.75);
 }
 
+.flipview-info {
+  margin-top: 338px;
+  font-family: 'Bariol-Bold';
+  font-size: 1em;
+  font-weight: bolder;
+  width: 340px;
+  margin-left: -170px;
+  left: 50%;
+  position: absolute;
+  text-align: center;
+  color: #DADAD8;
+}
 
 .blackout input[type='submit']{
-  margin-top: 102%;
+  margin-top: 100%;
   -webkit-appearance: none;
   font-family: 'Bariol-Bold';
   background: none;
@@ -185,7 +240,7 @@ ul {
   position: absolute;
   margin-left: -170px;
   left: 50%;
-  height: 70px;
+  height: 80px;
   -webkit-border-radius: 15px;
   -moz-border-radius: 15px;
   border-radius: 15px;
@@ -195,6 +250,20 @@ ul {
   -moz-box-shadow: 0px 0px 6px -1px rgba(0,0,0,0.75);
   box-shadow: 0px 0px 6px -1px rgba(0,0,0,0.75);
 }
+
+.blackout-info {
+  margin-top: 432px;
+  font-family: 'Bariol-Bold';
+  font-size: 1em;
+  font-weight: bolder;
+  width: 300px;
+  margin-left: -150px;
+  left: 50%;
+  position: absolute;
+  text-align: center;
+  color: #DADAD8;
+}
+
 
 
 #black{
@@ -229,7 +298,7 @@ ul {
 }
 
 .allButtonsController span {
-  margin-top: 40px;
+  margin-top: 15px;
   font-family: 'Bariol-Bold';
   font-size: 1.6em;
   font-weight: bolder;
@@ -549,7 +618,6 @@ strong {
   box-shadow: 0px 0px 6px -1px rgba(0,0,0,0.75);
 }
 
-
 .error-restartgame {
   margin-top: 15%;
   -webkit-appearance: none;
@@ -574,7 +642,6 @@ strong {
   display: none;
 }
 
-
 .footer {
   position: absolute;
   bottom: 0;
@@ -584,6 +651,131 @@ strong {
   background-size: cover;
 }
 
+.animate-footer{
+  -webkit-animation: down 2s ease-in;
+  -moz-animation: down 2s ease-in;
+  -o-animation: down 2s ease-in;
+  -ms-animation: down 2s ease-in;
+  animation: down 2s ease-in;
+}
+
+@-webkit-keyframes down {
+  0% { bottom: 0; }
+  100% { bottom: -200px; }
+}
+
+
+#startinfo {
+  margin-top: 2%;
+  -webkit-appearance: none;
+  font-family: 'Bariol-Bold';
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5em;
+  width: 440px;
+  position: absolute;
+  margin-left: -220px;
+  left: 50%;
+  height: 100px;
+  text-align: center;
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  border-radius: 15px;
+  background-color: #6AC683;
+  display: none;
+  -webkit-box-shadow: 0px 0px 6px -1px rgba(0,0,0,0.75);
+  -moz-box-shadow: 0px 0px 6px -1px rgba(0,0,0,0.75);
+  box-shadow: 0px 0px 6px -1px rgba(0,0,0,0.75);
+  -webkit-animation: smooth 5s ease-in;
+  -moz-animation: smooth 5s ease-in;
+  -o-animation: smooth 5s ease-in;
+  -ms-animation: smooth 5s ease-in;
+  animation: smooth 5s ease-in;
+}
+
+
+
+
+
+@keyframes move {
+  100% {
+    transform: translate3d(200px, -450px, 0);
+  }
+}
+
+.bubble-wrap {
+  margin: 0 auto;
+  width: 500px;
+  height: 500px;
+  transform-style: preserve-3d;
+  transform-origin: center center;
+  perspective: 2000px;
+}
+
+.bubble {
+  position: absolute;
+  background: black;
+  opacity: .7;
+  border-radius: 50%;
+  animation: move 9s infinite;
+
+}
+
+@for $i from 1 through 100 {
+  .bubble:nth-child(#{$i}){
+     $size: random(15)+px;
+     height: $size;
+     width: $size;
+     animation-delay: -$i * .2s;
+     transform: translate3d( (random(1000) * 1px),  (random(1000) * 1px), (random(2000) * 1px));
+
+     background: hsl( 9 , 82%, 61%);
+  }
+
+}
+
+
+
+
+
+
+
+@keyframes move2 {
+  100% {
+    transform: translate3d(-(random(9400) * 1px), -(random(1000) * 1px), 0);
+  }
+}
+
+.bubble-wrap2 {
+  margin: 0 auto;
+  width: 500px;
+  height: 500px;
+  transform-style: preserve-3d;
+  transform-origin: center center;
+  perspective: 2000px;
+}
+
+.bubble2 {
+  position: absolute;
+  background: black;
+  opacity: .7;
+  border-radius: 50%;
+  animation: move2 12s infinite;
+
+}
+
+@for $i from 1 through 100 {
+  .bubble2:nth-child(#{$i}){
+     $size: random(8)+px;
+     height: $size;
+     width: $size;
+     animation-delay: -$i * .2s;
+     transform: translate3d( (random(1500) * 1px),  (random(900) * 1px), (random(2000) * 1px));
+     background: hsl( 9 , 82%, 61%);
+  }
+
+}
 
 
 
