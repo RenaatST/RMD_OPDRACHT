@@ -332,8 +332,6 @@ const init = () => {
 
   speed = 5;
 
-
-
   socket.on('socketid', data => {
     if(initialized === false){
       socketid = data;
