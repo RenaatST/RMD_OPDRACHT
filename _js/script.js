@@ -61,11 +61,11 @@ let desktopIDParticles;
 let SpelerColor;
 
 let shakeCam = false;
-
+let text;
 
 
 const gates = player => {
-  console.log(player);
+  //console.log(player);
   for(let i = 0; i < 10; i++){
     let random = (3000 * i);
     let posX = random + MathUtil.randomBetween(1000, 2000);
@@ -109,6 +109,7 @@ const gates = player => {
 
 
 let fix = true;
+
 const gameOver = () => {
   if(fix){
     cancelAnimationFrame(render);
@@ -316,7 +317,7 @@ const particlesAdd = () => {
 
 const init = () => {
 
-
+  console.log(spelers);
 
   socket.on('socketid', data => {
     if(initialized === false){
@@ -333,7 +334,32 @@ const init = () => {
   });
 
 
+  socket.on('yPosDownAllPlayers', (thisY, playerId ) => {
+    console.log(thisY);
 
+    if (spelers !== []) {
+      spelers.forEach(speler => {
+        if (speler.getSocketId() === playerId){
+          speler.positionY = thisY;
+
+        }
+      });
+    }
+  });
+
+  socket.on('yPosUpAllPlayers', (thisY, playerId ) => {
+
+    if (spelers !== []) {
+      spelers.forEach(speler => {
+        if (speler.getSocketId() === playerId){
+          speler.positionY = thisY;
+
+          //console.log(thisY);
+          //speler.text.style.top = speler.positionY;
+        }
+      });
+    }
+  });
 
 
   socket.on('disturbToAll', sockIdDisturb => {
@@ -403,41 +429,19 @@ const init = () => {
 
   socket.on('thisIsANewSpeler', client => {
 
-
     document.getElementById("startdeskt").style.display = "none";
 
-    let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
+    let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color, document.createElement('div'));
     scene.add(player.render());
     ownPlayer = player;
+    spelers.push(player);
+
 
     sound(player);
     gates(player);
   });
 
-  socket.on('yPosDownAllPlayers', (thisY, playerId ) => {
 
-
-    if (spelers !== []) {
-      spelers.forEach(speler => {
-        if (speler.getSocketId() === playerId){
-          speler.positionY = thisY;
-        }
-      });
-    }
-  });
-
-  socket.on('yPosUpAllPlayers', (thisY, playerId ) => {
-
-
-    if (spelers !== []) {
-      spelers.forEach(speler => {
-        if (speler.getSocketId() === playerId){
-          speler.positionY = thisY;
-            //console.log(thisY + " playerid " + playerId);
-        }
-      });
-    }
-  });
 
 };
 
@@ -473,24 +477,15 @@ const _desktop = htmlCode => {
 
   socket.on('newplayer', client => {
 
-    console.log("new player" + client.socketidMobile);
+    //console.log("new player" + client.socketidMobile);
     if(socketidDesktop !== client.socketidDesktop){
 
-      let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
+      let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color, document.createElement('div'));
       //console.log(`naar iedereen behalve zichzelf: deze speler is toegevoegd ${player.playersocketid}`);
       scene.add(player.render());
       spelers.push(player);
-    }else{
-      let text = document.createElement('div');
-      text.style.position = 'absolute';
-      text.style.width = 100;
-      text.style.height = 100;
-      text.innerHTML = "ME";
-      text.style.top = 200+"px";
-      text.style.left = 200+"px";
-      document.body.appendChild(text);
+      console.log("Voeg mezelf toe bij anderen " + spelers);
     }
-
 
 
 
@@ -542,6 +537,8 @@ const _desktop = htmlCode => {
   // });
 
 
+
+
 };
 
 const _mobile = htmlCode => {
@@ -578,7 +575,7 @@ const _mobile = htmlCode => {
   });
 
   socket.on('gameoverplayer', socketIdTodelete => {
-    console.log(document.getElementById("allbuttons"));
+
     document.getElementById("allbuttons").style.display = "none";
     document.getElementById("loginmobile").style.display = "inline-block";
     $('.codeloginmobile').val('');

@@ -5,15 +5,27 @@ import EventEmitter from 'eventemitter2';
 
 export default class Player extends EventEmitter {
 
-  constructor(socket, playersocketid, desktopsocketid, color){
+
+
+  constructor(socket, playersocketid, desktopsocketid, color, text){
     super();
     this.socket = socket;
+
+    this.text = text;
 
     this.playersocketid = playersocketid;
     this.desktopsocketid = desktopsocketid;
     this.positionX = 100;
     this.positionY = 100;
     this.color = color;
+
+
+    this.text.style.position = 'absolute';
+    this.text.style.width = 100;
+    this.text.style.height = 100;
+    this.text.innerHTML = "ME";
+    document.body.appendChild(this.text);
+
 
     this.render();
   }
@@ -31,6 +43,11 @@ export default class Player extends EventEmitter {
     this.circle.position.x = x;
     this.circle.position.y = y;
 
+
+    this.text.style.top = y +"px";
+    this.text.style.left = x +"px";
+
+
     requestAnimationFrame(() => this._onFrame());
   }
 
@@ -47,6 +64,10 @@ export default class Player extends EventEmitter {
 
     circle.position.x = x;
     circle.position.y = y;
+
+    this.text.style.top = y +"px";
+    this.text.style.left = x +"px";
+
     this._onFrame();
 
 

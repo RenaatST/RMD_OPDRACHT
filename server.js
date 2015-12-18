@@ -42,6 +42,7 @@ io.on('connection', socket => {
   socket.on('yPosDown', (playerposY, playerId) => {
     //console.log('dooooown' + playerposY + ' player id: ' + playerId);
     socket.broadcast.emit('yPosDownAllPlayers', playerposY, playerId);
+    socket.broadcast.to(playerId).emit('youPos', playerposY);
   });
 
   socket.on('yPosUp', (playerposY, playerId) => {
