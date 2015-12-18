@@ -21,8 +21,6 @@ html, body {
   padding: 0;
   background-color: #FAE17D;
   overflow: hidden;
-  min-height: 100%;
-  position: relative;
 }
 
 .bbackground {
@@ -35,11 +33,12 @@ html, body {
 
 
 .bbackground2 {
-  position: relative;
+  position: absolute;
   width: 100%;
   min-height: 100%;
   transform-style: preserve-3d;
   display: none;
+  z-index: -100;
 }
 
 
@@ -619,6 +618,7 @@ strong {
 }
 
 .error-restartgame {
+  z-index: 100;
   margin-top: 15%;
   -webkit-appearance: none;
   font-family: 'Bariol-Bold';
@@ -697,53 +697,9 @@ strong {
 
 
 
-
-@keyframes move {
-  100% {
-    transform: translate3d(200px, -450px, 0);
-  }
-}
-
-.bubble-wrap {
-  margin: 0 auto;
-  width: 500px;
-  height: 500px;
-  transform-style: preserve-3d;
-  transform-origin: center center;
-  perspective: 2000px;
-}
-
-.bubble {
-  position: absolute;
-  background: black;
-  opacity: .7;
-  border-radius: 50%;
-  animation: move 9s infinite;
-
-}
-
-@for $i from 1 through 100 {
-  .bubble:nth-child(#{$i}){
-     $size: random(15)+px;
-     height: $size;
-     width: $size;
-     animation-delay: -$i * .2s;
-     transform: translate3d( (random(1000) * 1px),  (random(1000) * 1px), (random(2000) * 1px));
-
-     background: hsl( 9 , 82%, 61%);
-  }
-
-}
-
-
-
-
-
-
-
 @keyframes move2 {
   100% {
-    transform: translate3d(-(random(9400) * 1px), -(random(1000) * 1px), 0);
+    transform: translate3d(-(random(10400) * 1px), (random(300) * 1px), 0);
   }
 }
 
@@ -761,7 +717,7 @@ strong {
   background: black;
   opacity: .7;
   border-radius: 50%;
-  animation: move2 12s infinite;
+  animation: move2 5s infinite;
 
 }
 

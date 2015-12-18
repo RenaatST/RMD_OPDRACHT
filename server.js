@@ -68,7 +68,7 @@ io.on('connection', socket => {
   });
 
   socket.on('disturb', (sockIdDisturb, socketDesktopID) => {
-    //console.log(socketidDownhill);
+    console.log(socketidDownhill);
     socket.broadcast.emit('disturbToAll', sockIdDisturb, socketDesktopID);
   });
 
@@ -120,7 +120,7 @@ io.on('connection', socket => {
           io.sockets.emit('newplayer', client);
 
         }else{
-          io.sockets.emit('error', mobileSocketIdInServer);
+          socket.emit('errorInformsubmit', mobileSocketIdInServer);
           console.log(key + " je zit verkeerd");
         }
       });

@@ -128,14 +128,32 @@ const delay = (ms) => {
 };
 
 
-const flipCamera = () => {
-  console.log('flip');
-  //camera.rotation.y = 25;
-  //camera.rotation.z = -80.11;
-  camera.rotation.z = -25;
-  delay(5000).then(function() {
-    normalCamera();
-  });
+const flipCamera = boolWhich => {
+  console.log(boolWhich);
+
+  if(boolWhich === 0){
+    camera.rotation.z = -25;
+    camera.position.z = 7000;
+    delay(5000).then(function() {
+      normalCamera();
+    });
+  }
+
+  if(boolWhich === 1){
+    camera.rotation.z = 105;
+    camera.position.z = 7000;
+    delay(5000).then(function() {
+      normalCamera();
+    });
+  }
+
+  if(boolWhich === 2){
+    camera.rotation.z = -80.11;
+    camera.position.z = 10000;
+    delay(5000).then(function() {
+      normalCamera();
+    });
+  }
 };
 
 
@@ -164,7 +182,7 @@ const render = player => {
     shakeCam = false;
   }
 
-  playerX += 20;
+  playerX += 36;
   camera.position.x = playerX + 2200;
 
 
@@ -331,31 +349,20 @@ const init = () => {
     initialized = true;
   });
 
-  socket.on('disturbToAll', (sockIdDisturb, socketDesktopID) => {
-
+    socket.on('disturbToAll', (sockIdDisturb, socketDesktopID) => {
     if (spelers !== []) {
       spelers.forEach(speler => {
-        if(speler.getDesktopSocketId() == socketDesktopID){
+        if(speler.getDesktopSocketId() !== socketDesktopID){
           //console.log("Disturb  " + speler.playersocketid + " met y pos " + speler.positionY);
           shakeCam = true;
+
         }
       });
     }
 
   });
 
-  socket.on('downHill', (IdFromDownHill, idFromDesktopDownHill) => {
 
-
-    if (spelers !== []) {
-      spelers.forEach(speler => {
-        if(speler.getDesktopSocketId() !== idFromDesktopDownHill){
-          console.log("downhill fast");
-          ownPlayer.positionY -= 200;
-        }
-      });
-    }
-  });
 
 
   socket.on('yPosDownAllPlayers', (thisY, playerId ) => {
@@ -442,7 +449,7 @@ const init = () => {
 
   socket.on('thisIsANewSpeler', client => {
     document.getElementById("startinfo").style.display = "inline-block";
-    document.getElementById("backgroundBalls1").style.display = "none";
+
     document.getElementById("backgroundBalls2").style.display = "inline-block";
 
     delay(5000).then(function() {
@@ -455,7 +462,7 @@ const init = () => {
     delay(2000).then(function() {
       document.getElementById("footer").style.display = "none";
     })
-    let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color, document.createElement('div'));
+    let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
     scene.add(player.render());
     ownPlayer = player;
 
@@ -468,14 +475,13 @@ const init = () => {
 
     //console.log("new player" + client.socketidMobile);
     if(socketidDesktop !== client.socketidDesktop){
-      let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color, document.createElement('div'));
+      let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
       //console.log(`naar iedereen behalve zichzelf: deze speler is toegevoegd ${player.playersocketid}`);
       scene.add(player.render());
       spelers.push(player);
     }
 
   });
-
 
 };
 
@@ -513,8 +519,17 @@ const _desktop = htmlCode => {
 
 
   socket.on('changeCameraViewToAll', (sockIdChangeView, socketDesktopID) => {
-    flipCamera();
+    flipCamera(MathUtil.randomBetween(0, 2));
   });
+
+  socket.on('downHill', (IdFromDownHill, idFromDesktopDownHill) => {
+    console.log("downhill fast");
+    ownPlayer.positionY -= 200;
+
+  });
+
+
+
 
 
 
@@ -576,7 +591,7 @@ const _mobile = htmlCode => {
     $('.codeloginmobile').val('');
   });
 
-  socket.on('error', iderror => {
+  socket.on('errorInformsubmit', iderror => {
     console.log('cool');
     // document.getElementById("error").style.display = "inline";
     $("#codeloginmobile").addClass("red-placeholder");
@@ -599,30 +614,31 @@ const detectSound = (data, player) => {
     if(data[i] > 0 && data[i-1] < 0 || data[i] < 0 && data[i-1] > 0) zeroCrossings++;
   }
 
-  if(highAmp > 10){
+  if(highAmp > 30){
     //console.log('up');
-      player.positionY += 20;
+
+    if(playerY < ((window.innerHeight*2) + 0) ){
+
+      player.positionY += 50;
       playerY = player.positionY;
-
-    if(playerY < window.innerHeight*2){
-
-      if(camera.position.z < 4500){
-        camera.position.z -= 20;
-      }
+      // if(camera.position.z < 4500){
+      //   camera.position.z -= 20;
+      // }
 
       socket.emit('yPosUp', player.positionY, player.playersocketid);
     }
 
   }else{
-    player.positionY -= 15;
+    player.positionY -= 50;
     playerY = player.positionY;
 
-    if(playerY < -window.innerHeight*2){
-      if(camera.position.z < 4000){
-       camera.position.z += 20;
-      }else{
-        camera.position.z = 4000
-      }
+    if(playerY < ((-window.innerHeight*2) + 80)){
+      player.positionY = ((-window.innerHeight*2) + 80);
+      // if(camera.position.z < 4000){
+      //  camera.position.z += 5;
+      // }else{
+      //   camera.position.z = 4000
+      // }
 
       socket.emit('yPosDown', player.positionY, player.playersocketid);
     }
