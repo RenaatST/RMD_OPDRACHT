@@ -45,7 +45,7 @@ export default class BlueGate extends EventEmitter {
   }
 
   _initBlue(posX, posY2){
-    this.color = 0x0000FF;
+    this.color = '#2F94D1';
     this.position.x = posX;
     this.position.y = posY2;
     return this.render();

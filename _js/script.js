@@ -15,6 +15,7 @@ let socketidDesktop;
 
 ////////////////GAME/////////////////////
 
+let speed;
 let bounds;
 let recorder = null;
 
@@ -61,11 +62,12 @@ let SpelerColor;
 
 let shakeCam = false;
 let text;
+let givespeed;
 
 
 const gates = player => {
   //console.log(player);
-  for(let i = 0; i < 10; i++){
+  for(let i = 0; i < 100; i++){
     let random = (3000 * i);
     let posX = random + MathUtil.randomBetween(1000, 2000);
     let posY2 = -window.innerHeight;
@@ -85,8 +87,6 @@ const gates = player => {
 
     scene.add(redGate._initRed(redGateArrX[i], redGateArrY[i]));
     scene.add(blueGate._initBlue(blueGateArrX[i], blueGateArrY[i]));
-
-
 
     redcube.push(redGate.cube);
     redcubehit.push(redGate._hitRed());
@@ -157,8 +157,6 @@ const shakeCamera = () => {
   });
 }
 
-
-
 const render = player => {
 
   if(shakeCam){
@@ -208,9 +206,8 @@ const render = player => {
             console.log("dit is het juist kleur");
           }else{
             console.log("game over");
-            //gameOver();
+            gameOver();
           }
-
 
           scene.remove(redcube[i]);
           scene.add(redcubehit[i]);
@@ -235,8 +232,7 @@ const render = player => {
             console.log("dit is het juist kleur");
           }else{
             console.log("game over");
-            //gameOver();
-
+            gameOver();
           }
           scene.remove(bluecube[i]);
           scene.add(bluecubehit[i]);
@@ -316,13 +312,14 @@ const particlesAdd = () => {
 
 const init = () => {
 
-  console.log(spelers);
+  speed = 5;
 
   socket.on('socketid', data => {
     if(initialized === false){
       socketid = data;
       if(Modernizr.touch) {
         $.get('/components/mobile.html', _mobile.bind(this));
+
         socketidMobile = socketid;
       } else {
         $.get('/components/desktop.html', _desktop.bind(this));
@@ -337,15 +334,25 @@ const init = () => {
     if (spelers !== []) {
       spelers.forEach(speler => {
         if(speler.getDesktopSocketId() == socketDesktopID){
-          console.log("Disturb  " + speler.playersocketid + " met y pos " + speler.positionY);
-
-          /////////////////////////////////DISTURB/////////////////////////////////////////
-          console.log("disturb");
+          //console.log("Disturb  " + speler.playersocketid + " met y pos " + speler.positionY);
           shakeCam = true;
         }
       });
     }
 
+  });
+
+  socket.on('downHill', (IdFromDownHill, idFromDesktopDownHill) => {
+
+
+    if (spelers !== []) {
+      spelers.forEach(speler => {
+        if(speler.getDesktopSocketId() !== idFromDesktopDownHill){
+          console.log("downhill fast");
+          ownPlayer.positionY -= 200;
+        }
+      });
+    }
   });
 
 
@@ -366,28 +373,11 @@ const init = () => {
       spelers.forEach(speler => {
         if (speler.getSocketId() === playerId){
           speler.positionY = thisY;
-
-          //console.log(thisY);
-          //speler.text.style.top = speler.positionY;
         }
       });
     }
   });
 
-
-  // socket.on('disturbToAllButYourself', (sockIdDisturb, socketDesktopID) => {
-
-
-  //   if (spelers !== []) {
-  //     spelers.forEach(speler => {
-  //       if(speler.getDesktopSocketId() !== socketDesktopID){
-  //         console.log("hey");
-  //         //console.log("Disturb  " + speler.playersocketid + " met y pos " + speler.positionY);
-  //         shakeCam = true;
-  //       }
-  //     });
-  //   }
-  // });
 
 
   socket.on('shuffleToAll', sockIdColor => {
@@ -410,22 +400,25 @@ const init = () => {
     document.getElementById("loginmobile").style.display = "none";
     document.getElementById("allbuttons").style.display = "inline";
 
+
+
     $('.disturb :submit').click(e => {
        e.preventDefault();
-     console.log('disturb');
+       console.log('disturb');
 
-
-     if(desktopIdSocket){
-         console.log(desktopIdSocket);
+       if(desktopIdSocket){
+          console.log(desktopIdSocket);
           socket.emit('disturb', socketidMobile, desktopIdSocket);
-     }
+       }
 
     });
 
 
     $('.downhill :submit').click(e => {
       e.preventDefault();
-      socket.emit('downhillFast', socketidMobile, desktopIdSocket);
+      if(desktopIdSocket){
+        socket.emit('downhillFast', socketidMobile, desktopIdSocket);
+      }
     });
 
 
@@ -455,26 +448,23 @@ const init = () => {
 
     sound(player);
     gates(player);
+
   });
 
   socket.on('newplayer', client => {
 
     //console.log("new player" + client.socketidMobile);
     if(socketidDesktop !== client.socketidDesktop){
-      console.log("voor toevoegen" + spelers);
       let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color, document.createElement('div'));
       //console.log(`naar iedereen behalve zichzelf: deze speler is toegevoegd ${player.playersocketid}`);
       scene.add(player.render());
       spelers.push(player);
-      console.log('na toevoegen ' + spelers);
     }
 
   });
 
 
-
 };
-
 
 
 const deleteplayer = deleteSocketId => {
@@ -509,58 +499,17 @@ const _desktop = htmlCode => {
   socket.emit('ditIsDesktopSocket', code, socketidDesktop);
 
 
-
-  socket.on('downHill', (IdFromDownHill, idFromDesktopDownHill) => {
-    //console.log('id from downhill ' + IdFromDownHill + ' and destkop' + idFromDesktopDownHill);
-    ownPlayer.positionY -= 200;
-  });
-
-
-
   socket.on('changeCameraViewToAll', (sockIdChangeView, socketDesktopID) => {
     flipCamera();
   });
-
-  // socket.on('sendParticlesToEveryone', (partPosX, partPosY, partMobileId, desktopID) => {
-  //   //console.log("particle x " + partPosX + " particle y " + partPosY + " partMobileId " + partMobileId);
-
-  //   //particles(partPosX, partPosY, partMobileId);
-  //   if (spelers !== []) {
-  //     spelers.forEach(speler => {
-  //       if(socket.id === desktopID){
-
-  //         particleGroup = new THREE.Object3D();
-  //         particleAttributes = { startSize: [], startPosition: [], randomness: [] };
-
-
-  //         particlesAdd();
-  //         scene.add(particleGroup);
-
-  //         let time = 2 * clock.getElapsedTime();
-
-  //         for ( let c = 0; c < particleGroup.children.length; c++){
-  //           // let sprite = particleGroup.children[ c ];
-  //           // let a = particleAttributes.randomness[c] + 10;
-  //           // let pulseFactor = Math.sin(a * time) * 0.1 + 0.5;
-  //           // sprite.position.x = particleAttributes.startPosition[c].x * pulseFactor;
-  //         }
-
-  //         // particleGroup.rotation.x = time * 1;
-  //         particleGroup.position.x = partPosX;
-  //         particleGroup.position.y = partPosY;
-
-  //       }
-  //     });
-  //   }
-
-  // });
-
 
 
 
 };
 
 const _mobile = htmlCode => {
+
+
 
   let randomBool = MathUtil.randomBetween(0,1);
 
@@ -592,6 +541,9 @@ const _mobile = htmlCode => {
 
 
   });
+
+
+
 
   socket.on('gameoverplayer', socketIdTodelete => {
 

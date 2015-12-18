@@ -47,7 +47,7 @@ export default class RedGate extends EventEmitter {
   }
 
   _initRed(posX, posY){
-    this.color = 0x990000;
+    this.color = '#CA473E';
     this.position.x = posX;
     this.position.y = posY;
 

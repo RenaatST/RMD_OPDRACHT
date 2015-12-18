@@ -64,7 +64,7 @@ io.on('connection', socket => {
 
 
   socket.on('downhillFast', (socketidDownhill, socketIdDesktopDownHill) => {
-    io.sockets.emit('downHill', socketidDownhill, socketIdDesktopDownHill);
+    socket.broadcast.emit('downHill', socketidDownhill, socketIdDesktopDownHill);
   });
 
   socket.on('disturb', (sockIdDisturb, socketDesktopID) => {
@@ -110,12 +110,12 @@ io.on('connection', socket => {
           let client  = new Client(mobileSocketIdInServer, code.id, color);
 
           socket.broadcast.to(code.id).emit('thisIsANewSpeler', client);
-          console.log("client to yourself " + client.socketidMobile);
+          //console.log("client to yourself " + client.socketidMobile);
 
           arrayMetKeys.splice(arrayMetKeys.indexOf(code), 1);
 
-          console.log("client to everyone " + client.socketidMobile);
-          console.log("desktop to everyone " + client.socketidDesktop);
+          //console.log("client to everyone " + client.socketidMobile);
+          //console.log("desktop to everyone " + client.socketidDesktop);
 
           io.sockets.emit('newplayer', client);
 
