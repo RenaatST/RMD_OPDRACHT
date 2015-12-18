@@ -718,20 +718,28 @@ strong {
   opacity: .7;
   border-radius: 50%;
   animation: move2 5s infinite;
-
 }
 
 @for $i from 1 through 100 {
   .bubble2:nth-child(#{$i}){
-     $size: random(8)+px;
-     height: $size;
-     width: $size;
-     animation-delay: -$i * .2s;
-     transform: translate3d( (random(1500) * 1px),  (random(900) * 1px), (random(2000) * 1px));
-     background: hsl( 9 , 82%, 61%);
+    $size: random(8)+px;
+    height: $size;
+    width: $size;
+    animation-delay: -$i * .2s;
+    transform: translate3d( (random(1500) * 1px),  (random(900) * 1px), (random(2000) * 1px));
+    background: hsl( 9 , 82%, 61%);
   }
-
 }
 
 
+#score{
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: none;
+  z-index: 110;
+  font-size: 2em;
+  font-family: 'Bariol-Bold';
+  text-transform: uppercase;
+}
 

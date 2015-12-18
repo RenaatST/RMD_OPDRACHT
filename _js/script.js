@@ -15,7 +15,6 @@ let socketidDesktop;
 
 ////////////////GAME/////////////////////
 
-let speed;
 let bounds;
 let recorder = null;
 
@@ -44,14 +43,11 @@ let redGate;
 
 let particleGroup;
 let particleAttributes;
-let clock = new THREE.Clock();
-let particleTexture = new THREE.TextureLoader().load( '../assets/image/particle.png');
 let totalParticles = 1;
 let radiusRange = 30;
 
 
 let spelers = [];
-
 let ownPlayer;
 
 let playerX;
@@ -61,15 +57,12 @@ let desktopIDParticles;
 let SpelerColor;
 
 let shakeCam = false;
-let text;
-let givespeed;
-
+let score = 0;
 
 const gates = player => {
-  //console.log(player);
   for(let i = 0; i < 160; i++){
     let random = (4000 * i);
-    let posX = random + MathUtil.randomBetween(1000, 2000);
+    let posX = random + MathUtil.randomBetween(1000, 2000) + 10000;
     let posY2 = -window.innerHeight;
     let posY1 = window.innerHeight;
 
@@ -99,42 +92,38 @@ const gates = player => {
     SpelerColor = player.color;
   }
 
-
-
-  render(player);
+  render();
 
 };
 
 
 
 let fix = true;
-
 const gameOver = () => {
   if(fix){
     cancelAnimationFrame(render);
     document.querySelector('main').removeChild(renderer.domElement);
-    socket.emit("gameover", playerIDParticles);
-    document.getElementById("errorinfo").style.display = "inline";
-    document.getElementById("gameover").style.display = "inline";
+    socket.emit('gameover', playerIDParticles);
+    document.getElementById('errorinfo').style.display = 'inline';
+    document.getElementById('gameover').style.display = 'inline';
+    document.getElementById('errorinfo').innerHTML = `You missed your gate, </br> your score was ${score} </br> Click restart to play again`;
+
     fix = false;
   }
 };
 
 
 const delay = (ms) => {
-  return new Promise(function (resolve, reject) {
+  return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
 };
 
-
 const flipCamera = boolWhich => {
-  console.log(boolWhich);
-
   if(boolWhich === 0){
     camera.rotation.z = -25;
     camera.position.z = 7000;
-    delay(5000).then(function() {
+    delay(5000).then(() => {
       normalCamera();
     });
   }
@@ -142,7 +131,7 @@ const flipCamera = boolWhich => {
   if(boolWhich === 1){
     camera.rotation.z = 105;
     camera.position.z = 7000;
-    delay(5000).then(function() {
+    delay(5000).then(() => {
       normalCamera();
     });
   }
@@ -150,7 +139,7 @@ const flipCamera = boolWhich => {
   if(boolWhich === 2){
     camera.rotation.z = -80.11;
     camera.position.z = 10000;
-    delay(5000).then(function() {
+    delay(5000).then(() => {
       normalCamera();
     });
   }
@@ -162,20 +151,17 @@ const normalCamera = () => {
   camera.rotation.z = 0;
   camera.position.z = 4000;
   camera.position.y = 0;
-  // delay(MathUtil.randomBetween(5000, 30000)).then(function() {
-  //   flipCamera();
-  // });
 };
 
 
 const shakeCamera = () => {
-  CameraYonder = MathUtil.randomBetween(50,60);
-  delay(2000).then(function() {
+  CameraYonder = MathUtil.randomBetween(50, 60);
+  delay(2000).then(() => {
     CameraYonder = 0;
   });
-}
+};
 
-const render = player => {
+const render = () => {
 
   if(shakeCam){
     shakeCamera();
@@ -210,23 +196,21 @@ const render = player => {
     let redX = redGateArrX[i];
     let arrRed = [];
 
-
-
-    for (let i = redX - 50; i < redX + 50; i++) {
-      arrRed.push(i);
+    for (let b = redX - 50; b < redX + 50; b++) {
+      arrRed.push(b);
     }
+
     if(arrRed !== []){
       arrRed.forEach(rood => {
-       if(redY1 > playerY && redY2 < playerY && rood === playerX){
-          //console.log('RED GATE - HIT');
-
-          if(SpelerColor == '#CA473E'){
-            console.log("dit is het juist kleur");
+        if(redY1 > playerY && redY2 < playerY && rood === playerX){
+          if(SpelerColor === '#CA473E'){
+            score++;
+            document.getElementById('score').innerHTML = score;
+            return;
           }else{
-            console.log("game over");
-            //gameOver();
+            document.getElementById('score').style.display = 'none';
+            gameOver();
           }
-
           scene.remove(redcube[i]);
           scene.add(redcubehit[i]);
         }
@@ -238,19 +222,18 @@ const render = player => {
     let blueX = blueGateArrX[i];
     let arrBlue = [];
 
-    for (let i = blueX - 50; i < blueX + 50; i++) {
-      arrBlue.push(i);
+    for (let l = blueX - 50; l < blueX + 50; l++) {
+      arrBlue.push(l);
     }
     if(arrBlue !== []){
       arrBlue.forEach(blauw => {
-       if(blueY1 > playerY && blueY2 < playerY && blauw === playerX){
-          //console.log('BLUE GATE - HIT');
-
-          if(SpelerColor == '#2F94D1'){
-            console.log("dit is het juist kleur");
+        if(blueY1 > playerY && blueY2 < playerY && blauw === playerX){
+          if(SpelerColor === '#2F94D1'){
+            score++;
+            document.getElementById('score').innerHTML = score;
           }else{
-            console.log("game over");
-            //gameOver();
+            document.getElementById('score').style.display = 'none';
+            gameOver();
           }
           scene.remove(bluecube[i]);
           scene.add(bluecubehit[i]);
@@ -263,38 +246,20 @@ const render = player => {
   particleGroup = new THREE.Object3D();
   particleAttributes = { startSize: [], startPosition: [], randomness: [] };
 
-
   particlesAdd();
   scene.add(particleGroup);
 
-  let time = 2 * clock.getElapsedTime();
-
-  for ( let c = 0; c < particleGroup.children.length; c++){
-    // let sprite = particleGroup.children[ c ];
-    // let a = particleAttributes.randomness[c] + 10;
-    // let pulseFactor = Math.sin(a * time) * 0.1 + 0.5;
-    // sprite.position.x = particleAttributes.startPosition[c].x * pulseFactor;
-  }
-
-  // particleGroup.rotation.x = time * 1;
   particleGroup.position.x = playerX-50;
   particleGroup.position.y = playerY;
 
-
-  // console.log(playerX);
-  // console.log(playerY);
-  // console.log(playerIDParticles);
-
-  socket.emit("particles", playerX, playerY, playerIDParticles, desktopIDParticles);
-
-
-
+  socket.emit('particles', playerX, playerY, playerIDParticles, desktopIDParticles);
 
   renderer.render(scene, camera);
   requestAnimationFrame(() => render());
 };
 
 const particlesAdd = () => {
+
   for( let i = 0; i < totalParticles; i++ ) {
 
     var material = new THREE.MeshBasicMaterial({
@@ -306,17 +271,10 @@ const particlesAdd = () => {
 
     var circleGeometry = new THREE.CircleGeometry( radius, segments );
 
-    // let spriteMaterial = new THREE.SpriteMaterial( { map: particleTexture, color: 0x0000FF} );
-    // let sprite = new THREE.Sprite( spriteMaterial );
-    let circle = new THREE.Mesh( circleGeometry, material )
-
-    // circle.scale.set( 15, 15, 1.0 ); // imageWidth, imageHeight
-    // circle.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
+    let circle = new THREE.Mesh( circleGeometry, material );
 
     circle.position.setLength( radiusRange * (Math.random() * 0.1 + 1) );
-    // sprite.material.color.setHSL( Math.random(), Math.random(), Math.random() );
-    // sprite.opacity = 0.80; // translucent particles
-    // sprite.material.blending = THREE.AdditiveBlending; // "glowing" particles
+
     particleGroup.add(circle);
     particleAttributes.startPosition.push(circle.position.clone());
     particleAttributes.randomness.push(Math.random());
@@ -329,8 +287,6 @@ const particlesAdd = () => {
 
 
 const init = () => {
-
-  speed = 5;
 
   socket.on('socketid', data => {
     if(initialized === false){
@@ -359,7 +315,6 @@ const init = () => {
   });
 
   socket.on('yPosUpAllPlayers', (thisY, playerId ) => {
-
     if (spelers !== []) {
       spelers.forEach(speler => {
         if (speler.getSocketId() === playerId){
@@ -370,34 +325,28 @@ const init = () => {
   });
 
   socket.on('blackoutToAll', (sockIdBlackout, socketDesktopID) => {
-
     if (spelers !== []) {
       spelers.forEach(speler => {
-        if(speler.getDesktopSocketId() == socketDesktopID){
-          document.getElementById("black").style.display = "inline";
-          delay(3000).then(function() {
-            document.getElementById("black").style.display = "none";
+        if(speler.getDesktopSocketId() === socketDesktopID){
+          document.getElementById('black').style.display = 'inline';
+          delay(3000).then(() => {
+            document.getElementById('black').style.display = 'none';
           });
         }
       });
     }
+
   });
 
   socket.on('schermwegdoen', desktopIdSocket => {
-    document.getElementById("loginmobile").style.display = "none";
-    document.getElementById("allbuttons").style.display = "inline";
-
-
+    document.getElementById('loginmobile').style.display = 'none';
+    document.getElementById('allbuttons').style.display = 'inline';
 
     $('.disturb :submit').click(e => {
-       e.preventDefault();
-       console.log('disturb');
-
-       if(desktopIdSocket){
-          console.log(desktopIdSocket);
-          socket.emit('disturb', socketidMobile, desktopIdSocket);
-       }
-
+      e.preventDefault();
+      if(desktopIdSocket){
+        socket.emit('disturb', socketidMobile, desktopIdSocket);
+      }
     });
 
 
@@ -411,39 +360,37 @@ const init = () => {
 
     $('.flipview :submit').click(e => {
       e.preventDefault();
-
       if(desktopIdSocket){
-          socket.emit('flipview', socketidMobile, desktopIdSocket);
+        socket.emit('flipview', socketidMobile, desktopIdSocket);
       }
-
     });
 
     $('.blackout :submit').click(e => {
-     e.preventDefault();
-     console.log('blackout');
-     if(desktopIdSocket){
-      console.log(desktopIdSocket);
-      socket.emit('blackout', socketidMobile, desktopIdSocket);
-     }
+      e.preventDefault();
+      if(desktopIdSocket){
+        console.log(desktopIdSocket);
+        socket.emit('blackout', socketidMobile, desktopIdSocket);
+      }
     });
 
   });
 
   socket.on('thisIsANewSpeler', client => {
-    document.getElementById("startinfo").style.display = "inline-block";
+    document.getElementById('startinfo').style.display = 'inline-block';
+    document.getElementById('score').style.display = 'inline-block';
+    document.getElementById('score').innerHTML = score;
+    document.getElementById('backgroundBalls2').style.display = 'inline-block';
 
-    document.getElementById("backgroundBalls2").style.display = "inline-block";
+    delay(5000).then(() => {
+      document.getElementById('footer').style.display = 'none';
+      document.getElementById('startinfo').style.display = 'none';
+    });
+    document.getElementById('startdeskt').style.display = 'none';
 
-    delay(5000).then(function() {
-      document.getElementById("footer").style.display = "none";
-      document.getElementById("startinfo").style.display = "none";
-    })
-    document.getElementById("startdeskt").style.display = "none";
-
-    $("#footer").addClass("animate-footer");
-    delay(2000).then(function() {
-      document.getElementById("footer").style.display = "none";
-    })
+    $('#footer').addClass('animate-footer');
+    delay(2000).then(() => {
+      document.getElementById('footer').style.display = 'none';
+    });
     let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
     scene.add(player.render());
     ownPlayer = player;
@@ -454,11 +401,8 @@ const init = () => {
   });
 
   socket.on('newplayer', client => {
-
-    //console.log("new player" + client.socketidMobile);
     if(socketidDesktop !== client.socketidDesktop){
       let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color);
-      //console.log(`naar iedereen behalve zichzelf: deze speler is toegevoegd ${player.playersocketid}`);
       scene.add(player.render());
       spelers.push(player);
     }
@@ -469,7 +413,6 @@ const init = () => {
 
 
 const deleteplayer = deleteSocketId => {
-  //console.log("this is client we need to delete " + socketid);
   if (spelers !== []) {
     spelers.forEach(speler => {
       if(speler.getSocketId() === deleteSocketId){
@@ -489,13 +432,10 @@ const _desktop = htmlCode => {
   });
 
   socketidDesktop = socket.id;
-  console.log('dit is socket.id ' + socket.id + " en dit is nu de socketidDesktop " + socketidDesktop);
 
   let code = MathUtil.makeCode();
 
-  //$('body').prepend(code);
-  console.log(code);
-  document.getElementById("putcodehere").innerHTML = code;
+  document.getElementById('putcodehere').innerHTML = code;
 
   socket.emit('ditIsDesktopSocket', code, socketidDesktop);
 
@@ -505,9 +445,8 @@ const _desktop = htmlCode => {
   });
 
   socket.on('downHill', (IdFromDownHill, idFromDesktopDownHill) => {
-    console.log("downhill fast");
+    console.log('downhill fast');
     ownPlayer.positionY -= 200;
-
   });
 
 
@@ -515,7 +454,6 @@ const _desktop = htmlCode => {
     if (spelers !== []) {
       spelers.forEach(speler => {
         if(speler.getDesktopSocketId() === socketDesktopID){
-          //console.log("Disturb  " + speler.playersocketid + " met y pos " + speler.positionY);
           shakeCam = true;
         }
       });
@@ -528,67 +466,51 @@ const _desktop = htmlCode => {
 
 const _mobile = htmlCode => {
 
+  let randomBool = MathUtil.randomBetween(0, 1);
 
-
-  let randomBool = MathUtil.randomBetween(0,1);
-
-  if(randomBool == 1){
+  if(randomBool === 1){
     SpelerColor = '#CA473E';
   }
 
-  if(randomBool == 0){
+  if(randomBool === 0){
     SpelerColor = '#2F94D1';
   }
 
   $('body').append($(htmlCode));
-  document.getElementById("allbuttons").style.display = "none";
+  document.getElementById('allbuttons').style.display = 'none';
 
   $('.login :submit').click(e => {
     e.preventDefault();
-
     let key = $('.login').find('input[type=text]').val().trim();
     socket.emit('ditIsMobileSocket', key, socketidMobile, SpelerColor);
   });
 
   socket.on('changeCameraViewToAll', (sockIdChangeView, socketDesktopID) => {
-
-    document.getElementById("changeView").disabled = true;
-
-    delay(5000).then(function() {
-     document.getElementById("changeView").disabled = false;
+    document.getElementById('changeView').disabled = true;
+    delay(5000).then(() => {
+      document.getElementById('changeView').disabled = false;
     });
-
-
   });
 
   socket.on('blackoutToAll', (sockIdBlackout, socketDesktopID) => {
-
-    document.getElementById("blackoutbtn").disabled = true;
-
-    delay(5000).then(function() {
-     document.getElementById("blackoutbtn").disabled = false;
+    document.getElementById('blackoutbtn').disabled = true;
+    delay(5000).then(() => {
+      document.getElementById('blackoutbtn').disabled = false;
     });
-
   });
 
 
   socket.on('gameoverplayer', socketIdTodelete => {
-
-    document.getElementById("allbuttons").style.display = "none";
-    document.getElementById("loginmobile").style.display = "inline-block";
+    document.getElementById('allbuttons').style.display = 'none';
+    document.getElementById('loginmobile').style.display = 'inline-block';
     $('.codeloginmobile').val('');
   });
 
   socket.on('errorInformsubmit', iderror => {
     console.log('cool');
-    // document.getElementById("error").style.display = "inline";
-    $("#codeloginmobile").addClass("red-placeholder");
+    $('#codeloginmobile').addClass('red-placeholder');
     $('.codeloginmobile').val('');
   });
-
-
-
-
 
 };
 
@@ -602,35 +524,20 @@ const detectSound = (data, player) => {
     if(data[i] > 0 && data[i-1] < 0 || data[i] < 0 && data[i-1] > 0) zeroCrossings++;
   }
 
-  if(highAmp > 30){
-    //console.log('up');
-
-    if(playerY < ((window.innerHeight*2) + 0) ){
-
+  if(highAmp > 10){
+    if(playerY < ((window.innerHeight*2) - 80)){
       player.positionY += 50;
       playerY = player.positionY;
-      // if(camera.position.z < 4500){
-      //   camera.position.z -= 20;
-      // }
-
       socket.emit('yPosUp', player.positionY, player.playersocketid);
     }
 
   }else{
-    player.positionY -= 50;
+    player.positionY -= 40;
     playerY = player.positionY;
-
     if(playerY < ((-window.innerHeight*2) + 80)){
       player.positionY = ((-window.innerHeight*2) + 80);
-      // if(camera.position.z < 4000){
-      //  camera.position.z += 5;
-      // }else{
-      //   camera.position.z = 4000
-      // }
-
       socket.emit('yPosDown', player.positionY, player.playersocketid);
     }
-
   }
 
   return false;
@@ -675,7 +582,6 @@ const sound = player => {
 
 const startBackgroundFromGame = () => {
 
-
   let AudioContext = window.AudioContext || window.webkitAudioContext;
   audioContext = new AudioContext();
 
@@ -685,6 +591,7 @@ const startBackgroundFromGame = () => {
     depth: 1000,
     border: 40
   };
+
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(
     45, window.innerWidth / window.innerHeight,
@@ -701,7 +608,6 @@ const startBackgroundFromGame = () => {
   document.querySelector('main').appendChild(renderer.domElement);
 
   camera.position.z = 4000;
-
 
 };
 
