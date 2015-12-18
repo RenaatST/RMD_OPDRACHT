@@ -68,7 +68,6 @@ io.on('connection', socket => {
   });
 
   socket.on('disturb', (sockIdDisturb, socketDesktopID) => {
-    console.log(socketidDownhill);
     socket.broadcast.emit('disturbToAll', sockIdDisturb, socketDesktopID);
   });
 
@@ -79,7 +78,7 @@ io.on('connection', socket => {
 
   socket.on('blackout', (sockIdBlackout, socketDesktopID) => {
     //console.log(socketidDownhill);
-    io.sockets.emit('blackoutToAll', sockIdBlackout, socketDesktopID);
+    socket.broadcast.emit('blackoutToAll', sockIdBlackout, socketDesktopID);
   });
 
 

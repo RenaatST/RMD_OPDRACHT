@@ -347,22 +347,6 @@ const init = () => {
     initialized = true;
   });
 
-    socket.on('disturbToAll', (sockIdDisturb, socketDesktopID) => {
-    if (spelers !== []) {
-      spelers.forEach(speler => {
-        if(speler.getDesktopSocketId() !== socketDesktopID){
-          //console.log("Disturb  " + speler.playersocketid + " met y pos " + speler.positionY);
-          shakeCam = true;
-
-        }
-      });
-    }
-
-  });
-
-
-
-
   socket.on('yPosDownAllPlayers', (thisY, playerId ) => {
 
     if (spelers !== []) {
@@ -527,8 +511,17 @@ const _desktop = htmlCode => {
   });
 
 
+  socket.on('disturbToAll', (sockIdDisturb, socketDesktopID) => {
+    if (spelers !== []) {
+      spelers.forEach(speler => {
+        if(speler.getDesktopSocketId() === socketDesktopID){
+          //console.log("Disturb  " + speler.playersocketid + " met y pos " + speler.positionY);
+          shakeCam = true;
+        }
+      });
+    }
 
-
+  });
 
 
 };
@@ -576,10 +569,7 @@ const _mobile = htmlCode => {
      document.getElementById("blackoutbtn").disabled = false;
     });
 
-
   });
-
-
 
 
   socket.on('gameoverplayer', socketIdTodelete => {
