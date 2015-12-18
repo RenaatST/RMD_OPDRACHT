@@ -69,7 +69,7 @@ io.on('connection', socket => {
 
   socket.on('disturb', (sockIdDisturb, socketDesktopID) => {
     //console.log(socketidDownhill);
-    io.sockets.emit('disturbToAll', sockIdDisturb, socketDesktopID);
+    socket.broadcast.emit('disturbToAll', sockIdDisturb, socketDesktopID);
   });
 
   socket.on('flipview', (sockIdChangeView, socketDesktopID) => {
