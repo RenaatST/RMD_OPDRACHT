@@ -77,9 +77,9 @@ io.on('connection', socket => {
     io.sockets.emit('changeCameraViewToAll', sockIdChangeView, socketDesktopID);
   });
 
-  socket.on('shuffle', sockIdShuffle => {
+  socket.on('blackout', (sockIdBlackout, socketDesktopID) => {
     //console.log(socketidDownhill);
-    io.sockets.emit('shuffleToAll', sockIdShuffle);
+    socket.broadcast.emit('blackoutToAll', sockIdBlackout, socketDesktopID);
   });
 
 
@@ -120,6 +120,7 @@ io.on('connection', socket => {
           io.sockets.emit('newplayer', client);
 
         }else{
+          io.sockets.emit('error', mobileSocketIdInServer);
           console.log(key + " je zit verkeerd");
         }
       });

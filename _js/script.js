@@ -379,22 +379,19 @@ const init = () => {
   });
 
 
-
-  socket.on('shuffleToAll', sockIdColor => {
+  socket.on('blackoutToAll', (sockIdBlackout, socketDesktopID) => {
 
     if (spelers !== []) {
       spelers.forEach(speler => {
-        if(speler.getSocketId() === sockIdColor){
-          //console.log("Shuffle all " + speler.playersocketid + " met y pos " + speler.positionY);
-
-          /////////////////////////////////SHUFFLE/////////////////////////////////////////
-
+        if(speler.getDesktopSocketId() == socketDesktopID){
+          document.getElementById("black").style.display = "inline";
+          delay(3000).then(function() {
+            document.getElementById("black").style.display = "none";
+          });
         }
       });
     }
-
   });
-
 
   socket.on('schermwegdoen', desktopIdSocket => {
     document.getElementById("loginmobile").style.display = "none";
@@ -431,9 +428,13 @@ const init = () => {
 
     });
 
-    $('.shuffle :submit').click(e => {
-      e.preventDefault();
-      socket.emit('shuffle', socketidMobile);
+    $('.blackout :submit').click(e => {
+     e.preventDefault();
+     console.log('blackout');
+     if(desktopIdSocket){
+      console.log(desktopIdSocket);
+      socket.emit('blackout', socketidMobile, desktopIdSocket);
+     }
     });
 
   });
@@ -551,6 +552,14 @@ const _mobile = htmlCode => {
     document.getElementById("loginmobile").style.display = "inline-block";
     $('.codeloginmobile').val('');
   });
+
+  socket.on('error', iderror => {
+    console.log('cool');
+    // document.getElementById("error").style.display = "inline";
+    $("#codeloginmobile").addClass("red-placeholder");
+    $('.codeloginmobile').val('');
+  });
+
 
 
 
