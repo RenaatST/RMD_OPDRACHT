@@ -49,8 +49,7 @@ let totalParticles = 1;
 let radiusRange = 30;
 
 
-let spelers;
-spelers = [];
+let spelers = [];
 
 let ownPlayer;
 
@@ -209,7 +208,7 @@ const render = player => {
             console.log("dit is het juist kleur");
           }else{
             console.log("game over");
-            gameOver();
+            //gameOver();
           }
 
 
@@ -236,7 +235,7 @@ const render = player => {
             console.log("dit is het juist kleur");
           }else{
             console.log("game over");
-            gameOver();
+            //gameOver();
 
           }
           scene.remove(bluecube[i]);
@@ -333,15 +332,29 @@ const init = () => {
     initialized = true;
   });
 
+  socket.on('disturbToAll', (sockIdDisturb, socketDesktopID) => {
+
+    if (spelers !== []) {
+      spelers.forEach(speler => {
+        if(speler.getDesktopSocketId() == socketDesktopID){
+          console.log("Disturb  " + speler.playersocketid + " met y pos " + speler.positionY);
+
+          /////////////////////////////////DISTURB/////////////////////////////////////////
+          console.log("disturb");
+          shakeCam = true;
+        }
+      });
+    }
+
+  });
+
 
   socket.on('yPosDownAllPlayers', (thisY, playerId ) => {
-    console.log(thisY);
 
     if (spelers !== []) {
       spelers.forEach(speler => {
         if (speler.getSocketId() === playerId){
           speler.positionY = thisY;
-
         }
       });
     }
@@ -362,17 +375,19 @@ const init = () => {
   });
 
 
-  socket.on('disturbToAll', sockIdDisturb => {
+  // socket.on('disturbToAllButYourself', (sockIdDisturb, socketDesktopID) => {
 
-    if (spelers !== []) {
-      spelers.forEach(speler => {
-        if(speler.getSocketId() === sockIdDisturb){
-          //console.log("Disturb  " + speler.playersocketid + " met y pos " + speler.positionY);
-          shakeCam = true;
-        }
-      });
-    }
-  });
+
+  //   if (spelers !== []) {
+  //     spelers.forEach(speler => {
+  //       if(speler.getDesktopSocketId() !== socketDesktopID){
+  //         console.log("hey");
+  //         //console.log("Disturb  " + speler.playersocketid + " met y pos " + speler.positionY);
+  //         shakeCam = true;
+  //       }
+  //     });
+  //   }
+  // });
 
 
   socket.on('shuffleToAll', sockIdColor => {
@@ -396,11 +411,14 @@ const init = () => {
     document.getElementById("allbuttons").style.display = "inline";
 
     $('.disturb :submit').click(e => {
-      e.preventDefault();
+       e.preventDefault();
+     console.log('disturb');
 
-      if(desktopIdSocket){
+
+     if(desktopIdSocket){
+         console.log(desktopIdSocket);
           socket.emit('disturb', socketidMobile, desktopIdSocket);
-      }
+     }
 
     });
 
@@ -434,11 +452,23 @@ const init = () => {
     let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color, document.createElement('div'));
     scene.add(player.render());
     ownPlayer = player;
-    spelers.push(player);
-
 
     sound(player);
     gates(player);
+  });
+
+  socket.on('newplayer', client => {
+
+    //console.log("new player" + client.socketidMobile);
+    if(socketidDesktop !== client.socketidDesktop){
+      console.log("voor toevoegen" + spelers);
+      let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color, document.createElement('div'));
+      //console.log(`naar iedereen behalve zichzelf: deze speler is toegevoegd ${player.playersocketid}`);
+      scene.add(player.render());
+      spelers.push(player);
+      console.log('na toevoegen ' + spelers);
+    }
+
   });
 
 
@@ -467,6 +497,9 @@ const _desktop = htmlCode => {
     deleteplayer(socketidToDelete);
   });
 
+  socketidDesktop = socket.id;
+  console.log('dit is socket.id ' + socket.id + " en dit is nu de socketidDesktop " + socketidDesktop);
+
   let code = MathUtil.makeCode();
 
   //$('body').prepend(code);
@@ -475,21 +508,7 @@ const _desktop = htmlCode => {
 
   socket.emit('ditIsDesktopSocket', code, socketidDesktop);
 
-  socket.on('newplayer', client => {
 
-    //console.log("new player" + client.socketidMobile);
-    if(socketidDesktop !== client.socketidDesktop){
-
-      let player = new Player(socket, client.socketidMobile, client.socketidDesktop, client.color, document.createElement('div'));
-      //console.log(`naar iedereen behalve zichzelf: deze speler is toegevoegd ${player.playersocketid}`);
-      scene.add(player.render());
-      spelers.push(player);
-      console.log("Voeg mezelf toe bij anderen " + spelers);
-    }
-
-
-
-  });
 
   socket.on('downHill', (IdFromDownHill, idFromDesktopDownHill) => {
     //console.log('id from downhill ' + IdFromDownHill + ' and destkop' + idFromDesktopDownHill);

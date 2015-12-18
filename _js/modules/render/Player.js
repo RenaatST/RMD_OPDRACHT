@@ -75,8 +75,13 @@ export default class Player extends EventEmitter {
 
   }
 
+
   getSocketId(){
     return this.playersocketid;
+  }
+
+  getDesktopSocketId(){
+    return this.desktopsocketid;
   }
 
 }
