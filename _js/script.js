@@ -338,6 +338,10 @@ const init = () => {
 
   });
 
+  socket.on('removePlayer', socketidToDelete => {
+    deleteplayer(socketidToDelete);
+  });
+
   socket.on('schermwegdoen', desktopIdSocket => {
     document.getElementById('loginmobile').style.display = 'none';
     document.getElementById('allbuttons').style.display = 'inline';
@@ -427,9 +431,7 @@ const _desktop = htmlCode => {
   startBackgroundFromGame();
   $('.container').append($(htmlCode));
 
-  socket.on('removePlayer', socketidToDelete => {
-    deleteplayer(socketidToDelete);
-  });
+
 
   socketidDesktop = socket.id;
 
