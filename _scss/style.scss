@@ -619,7 +619,8 @@ strong {
 
 .error-restartgame {
   z-index: 100;
-  margin-top: 15%;
+  margin-top: 14%;
+  padding-top: 8px;
   -webkit-appearance: none;
   font-family: 'Bariol-Bold';
   background: none;
@@ -630,15 +631,14 @@ strong {
   position: absolute;
   margin-left: -220px;
   left: 50%;
-  height: 130px;
+  height: 111px;
   text-align: center;
-  -webkit-border-radius: 15px;
-  -moz-border-radius: 15px;
   border-radius: 15px;
   background-color: #CA473E;
   -webkit-box-shadow: 0px 0px 6px -1px rgba(0,0,0,0.75);
   -moz-box-shadow: 0px 0px 6px -1px rgba(0,0,0,0.75);
-  box-shadow: 0px 0px 6px -1px rgba(0,0,0,0.75);
+  box-shadow: 0px 0px 6px -1px rgba(0, 0, 0, 0.75);
+
   display: none;
 }
 
@@ -734,8 +734,8 @@ strong {
 
 #score{
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 10px;
+  right: 10px;
   display: none;
   z-index: 110;
   font-size: 2em;
