@@ -79,7 +79,7 @@ io.on('connection', socket => {
 
   socket.on('blackout', (sockIdBlackout, socketDesktopID) => {
     //console.log(socketidDownhill);
-    socket.broadcast.emit('blackoutToAll', sockIdBlackout, socketDesktopID);
+    io.sockets.emit('blackoutToAll', sockIdBlackout, socketDesktopID);
   });
 
 

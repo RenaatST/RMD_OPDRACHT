@@ -15,7 +15,7 @@ export default class Player extends EventEmitter {
 
     this.playersocketid = playersocketid;
     this.desktopsocketid = desktopsocketid;
-    this.positionX = 100;
+    this.positionX = -100;
     this.positionY = 100;
     this.color = color;
 
@@ -37,7 +37,7 @@ export default class Player extends EventEmitter {
     let y = this.positionY;
 
 
-    this.positionX += 5;
+    this.positionX += 10;
 
 
     this.circle.position.x = x;

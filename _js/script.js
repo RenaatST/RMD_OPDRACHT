@@ -67,8 +67,8 @@ let givespeed;
 
 const gates = player => {
   //console.log(player);
-  for(let i = 0; i < 100; i++){
-    let random = (3000 * i);
+  for(let i = 0; i < 160; i++){
+    let random = (4000 * i);
     let posX = random + MathUtil.randomBetween(1000, 2000);
     let posY2 = -window.innerHeight;
     let posY1 = window.innerHeight;
@@ -130,9 +130,9 @@ const delay = (ms) => {
 
 const flipCamera = () => {
   console.log('flip');
-  camera.rotation.y = -25;
-  camera.rotation.z = 80.11;
-  camera.position.z = 3500;
+  //camera.rotation.y = 25;
+  //camera.rotation.z = -80.11;
+  camera.rotation.z = -25;
   delay(5000).then(function() {
     normalCamera();
   });
@@ -164,8 +164,8 @@ const render = player => {
     shakeCam = false;
   }
 
-  playerX += 10;
-  camera.position.x = playerX;
+  playerX += 20;
+  camera.position.x = playerX + 2200;
 
 
   if(moveCameraDown === false){
@@ -206,7 +206,7 @@ const render = player => {
             console.log("dit is het juist kleur");
           }else{
             console.log("game over");
-            gameOver();
+            //gameOver();
           }
 
           scene.remove(redcube[i]);
@@ -232,7 +232,7 @@ const render = player => {
             console.log("dit is het juist kleur");
           }else{
             console.log("game over");
-            gameOver();
+            //gameOver();
           }
           scene.remove(bluecube[i]);
           scene.add(bluecubehit[i]);
@@ -377,7 +377,6 @@ const init = () => {
       });
     }
   });
-
 
   socket.on('blackoutToAll', (sockIdBlackout, socketDesktopID) => {
 
@@ -543,6 +542,17 @@ const _mobile = htmlCode => {
 
   });
 
+  socket.on('blackoutToAll', (sockIdBlackout, socketDesktopID) => {
+
+    document.getElementById("blackoutbtn").disabled = true;
+
+    delay(5000).then(function() {
+     document.getElementById("blackoutbtn").disabled = false;
+    });
+
+
+  });
+
 
 
 
@@ -578,16 +588,16 @@ const detectSound = (data, player) => {
 
   if(highAmp > 10){
     //console.log('up');
-    player.positionY += 10;
+    player.positionY += 20;
     playerY = player.positionY;
-    if(camera.position.z < 5000){
+    if(camera.position.z < 4500){
       camera.position.z -= 20;
     }
 
     socket.emit('yPosUp', player.positionY, player.playersocketid);
 
   }else{
-    player.positionY -= 5;
+    player.positionY -= 15;
     playerY = player.positionY;
     if(camera.position.z < 4000){
      camera.position.z += 20;
